@@ -29,9 +29,7 @@ export const Hero: React.FC = () => {
 
         <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
           <a 
-            href="https://wa.me/5581999492208"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#contato"
             className="group relative px-8 py-4 bg-gold-500 text-black font-display font-bold uppercase tracking-widest overflow-hidden hover:bg-white transition-colors duration-300"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">

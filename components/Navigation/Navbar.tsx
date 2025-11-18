@@ -28,7 +28,8 @@ export const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <a href="#" className="flex-shrink-0">
+          {/* Logo Anchor to Top */}
+          <a href="#inicio" className="flex-shrink-0">
             <Logo className="h-10 md:h-12" />
           </a>
 
@@ -43,10 +44,10 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </a>
             ))}
+            
+            {/* CTA is now an Anchor to Contact Section */}
             <a 
-              href="https://wa.me/5581999492208"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contato"
               className="px-5 py-2 text-sm font-display font-bold uppercase tracking-widest border border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black transition-all duration-300"
             >
               Solicitar Projeto
@@ -79,6 +80,13 @@ export const Navbar: React.FC = () => {
                 {link.name}
               </a>
             ))}
+            <a
+              href="#contato"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 text-base font-display font-bold uppercase tracking-wider text-gold-500 hover:bg-white/5"
+            >
+              Solicitar Projeto
+            </a>
           </div>
         </div>
       )}
