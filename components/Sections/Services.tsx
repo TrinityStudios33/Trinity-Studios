@@ -1,10 +1,25 @@
 import React from 'react';
-import { Film, Bot, MonitorPlay, Palette, Megaphone, Box, LucideIcon } from 'lucide-react';
+import { 
+  Film, 
+  MonitorPlay, 
+  Box, 
+  Palette, 
+  Bot, 
+  Cpu, 
+  Smartphone, 
+  Camera, 
+  Aperture, 
+  Code, 
+  Lightbulb, 
+  GraduationCap, 
+  UserCheck, 
+  LucideIcon 
+} from 'lucide-react';
 import { VideoGenerator } from '../Features/VideoGenerator';
 
 interface ServiceCardProps {
   title: string;
-  description: string;
+  description: React.ReactNode;
   icon: LucideIcon;
 }
 
@@ -22,9 +37,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon: Ico
         {title}
       </h3>
       
-      <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300">
+      <div className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 whitespace-pre-line">
         {description}
-      </p>
+      </div>
     </div>
 
     {/* Corner Accent */}
@@ -36,33 +51,68 @@ export const Services: React.FC = () => {
   const services = [
     {
       icon: Film,
-      title: "Produção de Vídeo",
-      description: "Institucional, comercial, trailers, documentários e roteiros narrativos com qualidade cinematográfica."
-    },
-    {
-      icon: Bot,
-      title: "Criação com IA",
-      description: "Geração de avatares, narrações sintéticas, personagens virtuais, imagens conceituais e efeitos via IA."
+      title: "Produção Audiovisual",
+      description: "Filmes institucionais\nComerciais e Vídeos publicitários\nDocumentários\nConteúdos para YouTube\nRoteiros técnicos e narrativos"
     },
     {
       icon: MonitorPlay,
-      title: "Edição e Pós",
-      description: "Montagem precisa, correção de cor (color grading), sound design e finalização broadcast."
+      title: "Pós Produção e VFX",
+      description: "Motion graphics\nVFX avançado\nCorreção de cor (Color Grading)\nEdição cinematográfica\nMixagem e masterização de áudio"
     },
     {
       icon: Box,
-      title: "3D & Unreal Engine",
-      description: "Cenários realistas, ambientes virtuais, product viz e cenas cinematográficas renderizadas em tempo real."
+      title: "Universos Digitais & 3D",
+      description: "Cinemáticas 3D\nAnimações em alta definição\nVisuals futuristas para storytelling\nDesign de ambientes digitais"
     },
     {
       icon: Palette,
       title: "Identidade Visual",
-      description: "Design digital, branding, motion graphics e construção de marcas fortes no ambiente digital."
+      description: "Criação de marca\nManual de identidade\nMateriais de apresentação\nDesign visual para campanhas"
     },
     {
-      icon: Megaphone,
-      title: "Marketing Criativo",
-      description: "Estratégias visuais, roteiros otimizados para YouTube e conteúdo de alta conversão."
+      icon: Bot,
+      title: "Conteúdo com IA",
+      description: "Imagens hiper realistas\nVídeos gerados por IA\nVoz sintética profissional\nRoteiros otimizados por IA"
+    },
+    {
+      icon: Cpu,
+      title: "Automação Digital",
+      description: "Criação de fluxos automáticos\nSistemas no code\nAutomação para empresas\nOrganização e inteligência operacional"
+    },
+    {
+      icon: Smartphone,
+      title: "Gestão e Social Media",
+      description: "Planejamento de conteúdo\nEstratégias de engajamento\nEdição contínua de reels e shorts\nGerenciamento profissional de perfis"
+    },
+    {
+      icon: Camera,
+      title: "Fotografia Profissional",
+      description: "Ensaio presencial\nRetratos corporativos\nFotografia de produtos\nBook empresarial"
+    },
+    {
+      icon: Aperture,
+      title: "Fotografia com IA",
+      description: "Ensaios completos digitais\nAvatares hiper realistas\nCenários personalizados\nEdição avançada de imagens"
+    },
+    {
+      icon: Code,
+      title: "Desenvolvimento Web",
+      description: "Sites estáticos cinematográficos\nLanding pages de alta conversão\nPortfólios interativos"
+    },
+    {
+      icon: Lightbulb,
+      title: "Consultoria Criativa",
+      description: "Direção artística\nEstratégias de posicionamento\nDesenvolvimento de narrativas\nAnálise de identidade e comunicação"
+    },
+    {
+      icon: GraduationCap,
+      title: "Cursos Profissionais",
+      description: "Produção audiovisual\nInteligência artificial aplicada\nEdição e pós produção\nCriação de conteúdo estratégico\nNarrativa e roteiro"
+    },
+    {
+      icon: UserCheck,
+      title: "Mentorias Individuais",
+      description: "Mentoria para criadores\nMentoria para empresas\nMentoria técnica em IA\nAcompanhamento de projetos\nEstruturação de negócios digitais"
     }
   ];
 

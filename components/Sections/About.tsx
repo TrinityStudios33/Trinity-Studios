@@ -25,16 +25,19 @@ export const About: React.FC = () => {
           {/* Text Content */}
           <div className="order-1 lg:order-2">
             <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-4">
-              Sobre a Trinity
+              Nossa História
             </h2>
             <h3 className="text-3xl md:text-4xl font-cyber font-bold text-white mb-6">
-              Criamos o inimaginável com precisão digital
+              Da visão à realidade
             </h3>
             <p className="text-gray-300 text-lg leading-relaxed mb-6">
-              Trinity Studios une criatividade, técnica e inteligência artificial em um ecossistema de produção audiovisual único.
+              A trajetória da Trinity Studios nasce da visão criativa de Kevin Marques, que iniciou sua jornada no audiovisual em 2018 ao fundar a antiga JKSTUDIOS. Desde o começo, o foco sempre esteve na construção de experiências visuais e sonoras capazes de envolver, emocionar e contar histórias com personalidade própria.
+            </p>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              O trabalho começou com canais no YouTube e a criação de cenários em 3D. Aos poucos, a demanda por qualidade e inovação cresceu, abrindo espaço para trilhas sonoras originais, composições musicais, produções completas de vídeo e trabalhos voltados para redes sociais. Cada projeto se tornou uma oportunidade de elevar o nível, expandir horizontes e explorar novas possibilidades criativas.
             </p>
             <p className="text-gray-400 leading-relaxed mb-8">
-              Não somos apenas uma produtora. Somos arquitetos de narrativas visuais. Criamos histórias fortes, imagens impactantes e projetos completos que integram design, edição, animação e tecnologia de ponta para entregar resultados que superam as expectativas do mercado.
+              Com o tempo, o nome evoluiu e a marca se tornou Trinity Studios, representando uma nova fase, mais madura e tecnológica, sem perder a essência artística que deu início a tudo. Hoje, a empresa conta com uma equipe completa, preparada e equipada com as melhores ferramentas do mercado.
             </p>
             <div className="flex gap-4">
                 <div className="h-1 w-12 bg-gold-500"></div>

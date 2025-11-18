@@ -44,7 +44,9 @@ export const Navbar: React.FC = () => {
               </a>
             ))}
             <a 
-              href="#contato"
+              href="https://wa.me/5581999492208"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-5 py-2 text-sm font-display font-bold uppercase tracking-widest border border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black transition-all duration-300"
             >
               Solicitar Projeto
