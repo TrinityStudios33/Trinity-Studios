@@ -1,4 +1,5 @@
 import React from 'react';
+import { GeometricMandala } from '../Background/GeometricMandala';
 
 // --- ÁREA DE CONFIGURAÇÃO DA FOTO ---
 // Cole o link direto da sua foto aqui dentro das aspas.
@@ -13,8 +14,11 @@ export const About: React.FC = () => {
     <section id="sobre" className="py-24 bg-black relative overflow-hidden scroll-mt-32">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/20 to-black pointer-events-none" />
       
-      {/* Decorative Background Elements */}
-      <div className="absolute top-20 right-0 w-96 h-96 bg-gold-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+      {/* Animated Geometric Background */}
+      <GeometricMandala />
+
+      {/* Additional Decorative Background Elements (Subtle) */}
+      <div className="absolute top-20 right-0 w-96 h-96 bg-gold-500/5 rounded-full blur-[100px] pointer-events-none mix-blend-screen"></div>
       <div className="absolute bottom-20 left-0 w-64 h-64 bg-blue-900/10 rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

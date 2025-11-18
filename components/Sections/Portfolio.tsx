@@ -1,24 +1,85 @@
 import React, { useState } from 'react';
 import { PortfolioItem } from '../../types';
-import { PlayCircle } from 'lucide-react';
+import { PlayCircle, X, Play } from 'lucide-react';
 
 const portfolioData: PortfolioItem[] = [
-  { id: 1, title: "Cyberpunk City", category: "3D", imageUrl: "https://picsum.photos/seed/cyber/800/600" },
-  { id: 2, title: "Neon Brand", category: "Design", imageUrl: "https://picsum.photos/seed/neon/800/600" },
-  { id: 3, title: "Future Tech Doc", category: "Documentários", imageUrl: "https://picsum.photos/seed/tech/800/600" },
-  { id: 4, title: "AI Avatar Series", category: "IA", imageUrl: "https://picsum.photos/seed/avatar/800/600" },
-  { id: 5, title: "Luxury Car Spot", category: "Comerciais", imageUrl: "https://picsum.photos/seed/car/800/600" },
-  { id: 6, title: "Abstract Motion", category: "Vídeo", imageUrl: "https://picsum.photos/seed/motion/800/600" },
+  { 
+    id: 1, 
+    title: "Cyberpunk City", 
+    category: "3D", 
+    imageUrl: "https://images.unsplash.com/photo-1515630278258-407f66498911?q=80&w=1920&auto=format&fit=crop", 
+    videoUrl: "https://vimeo.com/76979871" // The Third & The Seventh (Vimeo - Architectural 3D Masterpiece)
+  },
+  { 
+    id: 2, 
+    title: "Neon Brand", 
+    category: "Design", 
+    imageUrl: "https://picsum.photos/seed/neon/800/600" 
+  },
+  { 
+    id: 3, 
+    title: "Future Tech Doc", 
+    category: "Documentários", 
+    imageUrl: "https://picsum.photos/seed/tech/800/600",
+    videoUrl: "https://www.youtube.com/watch?v=qC5KtatMcUw" // Unreal Engine 5 Demo (Official - Safe for Embed)
+  },
+  { 
+    id: 4, 
+    title: "AI Avatar Series", 
+    category: "IA", 
+    imageUrl: "https://picsum.photos/seed/avatar/800/600" 
+  },
+  { 
+    id: 5, 
+    title: "Luxury Car Spot", 
+    category: "Comerciais", 
+    imageUrl: "https://picsum.photos/seed/car/800/600" 
+  },
+  { 
+    id: 6, 
+    title: "Abstract Motion", 
+    category: "Vídeo", 
+    imageUrl: "https://picsum.photos/seed/motion/800/600" 
+  },
 ];
 
 const categories = ['Todos', 'Vídeo', 'IA', '3D', 'Design', 'Documentários', 'Comerciais'];
 
 export const Portfolio: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Todos');
+  const [selectedProject, setSelectedProject] = useState<PortfolioItem | null>(null);
 
   const filteredItems = activeFilter === 'Todos' 
     ? portfolioData 
     : portfolioData.filter(item => item.category === activeFilter);
+
+  // Robust helper to convert YouTube/Vimeo links to embed URLs
+  const getEmbedUrl = (url: string) => {
+    try {
+      if (url.includes('vimeo.com')) {
+        // Matches /123456 in vimeo.com/123456 or vimeo.com/channels/staffpicks/123456
+        const match = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/);
+        const vimeoId = match ? match[1] : '';
+        return vimeoId ? `https://player.vimeo.com/video/${vimeoId}?autoplay=1&title=0&byline=0&portrait=0` : url;
+      }
+      
+      if (url.includes('youtu')) {
+        // Robust YouTube ID extraction (covers youtu.be, youtube.com/watch?v=, embed/, etc)
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        const videoId = (match && match[2].length === 11) ? match[2] : null;
+        
+        return videoId 
+          ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` 
+          : url;
+      }
+      
+      return url;
+    } catch (e) {
+      console.error("Error parsing video URL", e);
+      return url;
+    }
+  };
 
   return (
     <section id="portfolio" className="py-24 bg-black border-t border-white/5 scroll-mt-32">
@@ -50,7 +111,11 @@ export const Portfolio: React.FC = () => {
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
-            <div key={item.id} className="group relative aspect-[4/3] overflow-hidden cursor-pointer bg-gray-900">
+            <div 
+              key={item.id} 
+              onClick={() => item.videoUrl ? setSelectedProject(item) : null}
+              className={`group relative aspect-[4/3] overflow-hidden bg-gray-900 ${item.videoUrl ? 'cursor-pointer' : ''}`}
+            >
               <img 
                 src={item.imageUrl} 
                 alt={item.title} 
@@ -70,10 +135,14 @@ export const Portfolio: React.FC = () => {
                 </h4>
               </div>
 
-              {/* Play Icon Center */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <PlayCircle className="text-gold-500 w-16 h-16 drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]" strokeWidth={1} />
-              </div>
+              {/* Play Icon Center (Only if video exists) */}
+              {item.videoUrl && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                  <div className="w-16 h-16 rounded-full bg-gold-500/90 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)] group-hover:scale-110 transition-transform">
+                    <Play className="text-black fill-current ml-1" size={32} />
+                  </div>
+                </div>
+              )}
               
               {/* Border reveal */}
               <div className="absolute inset-0 border-2 border-gold-500/0 group-hover:border-gold-500/50 transition-colors duration-500 pointer-events-none"></div>
@@ -81,6 +150,39 @@ export const Portfolio: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Video Modal (Lightbox) */}
+      {selectedProject && selectedProject.videoUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="relative w-full max-w-5xl bg-zinc-900 border border-white/10 shadow-2xl rounded-sm overflow-hidden flex flex-col">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-4 right-4 z-50 p-2 bg-black/50 rounded-full text-white hover:text-gold-500 hover:bg-black transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Header inside modal */}
+            <div className="absolute top-0 left-0 w-full p-4 bg-gradient-to-b from-black/90 to-transparent z-40 pointer-events-none">
+              <h3 className="text-white font-cyber font-bold text-lg drop-shadow-md">{selectedProject.title}</h3>
+              <p className="text-gold-500 text-xs font-display uppercase tracking-wider drop-shadow-md">{selectedProject.category}</p>
+            </div>
+
+            {/* Video Player Container */}
+            <div className="relative w-full pt-[56.25%] bg-black">
+              <iframe
+                src={getEmbedUrl(selectedProject.videoUrl)}
+                className="absolute inset-0 w-full h-full"
+                title={selectedProject.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

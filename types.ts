@@ -11,6 +11,7 @@ export interface PortfolioItem {
   title: string;
   category: 'Vídeo' | 'IA' | '3D' | 'Design' | 'Documentários' | 'Comerciais';
   imageUrl: string;
+  videoUrl?: string; // Optional video link (YouTube/Vimeo)
 }
 
 export interface ProcessStep {

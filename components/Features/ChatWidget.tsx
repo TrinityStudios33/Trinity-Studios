@@ -12,7 +12,7 @@ export const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'model', text: 'Olá. Sou a Trinity AI. Como posso ajudar a elevar o nível do seu projeto hoje?' }
+    { id: '1', role: 'model', text: 'Olá. Sou o Agente treinado pela equipe Trinity, vamos montar seu projeto?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

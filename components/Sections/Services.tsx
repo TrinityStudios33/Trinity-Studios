@@ -12,7 +12,9 @@ import {
   Code, 
   Lightbulb, 
   GraduationCap, 
-  UserCheck, 
+  Gamepad2,
+  Images,
+  Users,
   LucideIcon 
 } from 'lucide-react';
 import { VideoGenerator } from '../Features/VideoGenerator';
@@ -68,6 +70,11 @@ export const Services: React.FC = () => {
       description: "Cinemáticas 3D\nAnimações em alta definição\nVisuals futuristas para storytelling\nDesign de ambientes digitais"
     },
     {
+      icon: Gamepad2,
+      title: "Desenvolvimento de Jogos",
+      description: "Jogos para PC e Android\nCriação em Unreal Engine 5\nAplicativos interativos\nExperiências imersivas"
+    },
+    {
       icon: Palette,
       title: "Identidade Visual",
       description: "Criação de marca\nManual de identidade\nMateriais de apresentação\nDesign visual para campanhas"
@@ -113,9 +120,14 @@ export const Services: React.FC = () => {
       description: "Produção audiovisual\nInteligência artificial aplicada\nEdição e pós produção\nCriação de conteúdo estratégico\nNarrativa e roteiro"
     },
     {
-      icon: UserCheck,
-      title: "Mentorias Individuais",
-      description: "Mentoria para criadores\nMentoria para empresas\nMentoria técnica em IA\nAcompanhamento de projetos\nEstruturação de negócios digitais"
+      icon: Images,
+      title: "Banco de Imagens",
+      description: "Acervo gratuito exclusivo\nAssets em alta resolução\nRecursos para criadores\nBiblioteca Trinity"
+    },
+    {
+      icon: Users,
+      title: "Comunidade & Networking",
+      description: "Interaja com criadores\nO networking que você precisa\nTroca de experiências\nJornada compartilhada"
     }
   ];
 
