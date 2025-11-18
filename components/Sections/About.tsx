@@ -10,7 +10,7 @@ const LINK_DA_FOTO = "https://i.postimg.cc/Sxc1MwZV/kevin.png";
 
 export const About: React.FC = () => {
   return (
-    <section id="sobre" className="py-24 bg-black relative overflow-hidden">
+    <section id="sobre" className="py-24 bg-black relative overflow-hidden scroll-mt-32">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/20 to-black pointer-events-none" />
       
       {/* Decorative Background Elements */}

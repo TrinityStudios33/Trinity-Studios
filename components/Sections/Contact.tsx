@@ -3,7 +3,7 @@ import { MessageCircle, MapPin } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   return (
-    <section id="contato" className="py-24 bg-black relative">
+    <section id="contato" className="py-24 bg-black relative scroll-mt-32">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center mb-12">

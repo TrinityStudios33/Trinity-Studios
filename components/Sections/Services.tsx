@@ -117,7 +117,7 @@ export const Services: React.FC = () => {
   ];
 
   return (
-    <section id="servicos" className="py-24 bg-zinc-950 relative">
+    <section id="servicos" className="py-24 bg-zinc-950 relative scroll-mt-32">
        {/* Section Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">O que fazemos</h2>

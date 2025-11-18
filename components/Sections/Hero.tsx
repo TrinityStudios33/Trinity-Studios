@@ -2,6 +2,14 @@ import React from 'react';
 import { ChevronRight, Play } from 'lucide-react';
 
 export const Hero: React.FC = () => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const element = document.querySelector(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section id="inicio" className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       
@@ -29,7 +37,9 @@ export const Hero: React.FC = () => {
 
         <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
           <a 
-            href="#contato"
+            href="https://wa.me/5581999492208"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group relative px-8 py-4 bg-gold-500 text-black font-display font-bold uppercase tracking-widest overflow-hidden hover:bg-white transition-colors duration-300"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
@@ -41,6 +51,7 @@ export const Hero: React.FC = () => {
           
           <a 
             href="#servicos"
+            onClick={(e) => handleNavClick(e, '#servicos')}
             className="group px-8 py-4 border border-white/20 text-white font-display font-bold uppercase tracking-widest hover:border-gold-500 hover:text-gold-500 transition-all duration-300 flex items-center justify-center gap-2 bg-black/50 backdrop-blur-sm"
           >
             <Play size={18} className="fill-current" />

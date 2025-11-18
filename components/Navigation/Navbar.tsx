@@ -12,6 +12,15 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    const element = document.querySelector(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const navLinks = [
     { name: 'Sobre', href: '#sobre' },
     { name: 'Serviços', href: '#servicos' },
@@ -29,7 +38,11 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo Anchor to Top */}
-          <a href="#inicio" className="flex-shrink-0">
+          <a 
+            href="#inicio" 
+            onClick={(e) => handleNavClick(e, '#inicio')}
+            className="flex-shrink-0"
+          >
             <Logo className="h-10 md:h-12" />
           </a>
 
@@ -39,15 +52,18 @@ export const Navbar: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className="text-sm font-display tracking-widest uppercase text-gray-300 hover:text-gold-500 transition-colors duration-300"
               >
                 {link.name}
               </a>
             ))}
             
-            {/* CTA is now an Anchor to Contact Section */}
+            {/* CTA - Direct WhatsApp Link */}
             <a 
-              href="#contato"
+              href="https://wa.me/5581999492208"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-5 py-2 text-sm font-display font-bold uppercase tracking-widest border border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black transition-all duration-300"
             >
               Solicitar Projeto
@@ -74,15 +90,16 @@ export const Navbar: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className="block px-3 py-2 text-base font-display uppercase tracking-wider text-gray-300 hover:text-gold-500 hover:bg-white/5"
               >
                 {link.name}
               </a>
             ))}
             <a
-              href="#contato"
-              onClick={() => setIsOpen(false)}
+              href="https://wa.me/5581999492208"
+              target="_blank"
+              rel="noopener noreferrer"
               className="block px-3 py-2 text-base font-display font-bold uppercase tracking-wider text-gold-500 hover:bg-white/5"
             >
               Solicitar Projeto
