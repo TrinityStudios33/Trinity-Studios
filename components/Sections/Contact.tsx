@@ -7,7 +7,7 @@ export const Contact: React.FC = () => {
         
         <div className="text-center mb-12">
           <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">Comece Agora</h2>
-          <h3 className="text-3xl md:text-5xl font-serif font-bold text-white mb-6">Materialize sua Visão</h3>
+          <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white mb-6">Materialize sua Visão</h3>
           <p className="text-gray-400">Preencha o formulário abaixo e entraremos em contato brevemente.</p>
         </div>
 

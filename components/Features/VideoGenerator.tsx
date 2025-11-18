@@ -111,7 +111,7 @@ export const VideoGenerator: React.FC = () => {
             <Film className="text-gold-500 w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-display font-bold text-white uppercase tracking-wider">Trinity Veo Lab</h3>
+            <h3 className="text-xl font-cyber font-bold text-white uppercase tracking-wider">Trinity Veo Lab</h3>
             <p className="text-xs text-gray-400 font-sans">Gerador de Vídeo Neural em Tempo Real</p>
           </div>
         </div>

@@ -16,7 +16,7 @@ export const Hero: React.FC = () => {
           </span>
         </div>
         
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-6 leading-tight">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-cyber font-bold text-white mb-6 leading-tight">
           Produção e tecnologia <br />
           <span className="text-transparent bg-clip-text bg-gold-gradient">que elevam seu projeto</span> <br />
           ao próximo nível

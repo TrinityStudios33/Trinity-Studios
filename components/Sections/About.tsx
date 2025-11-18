@@ -27,7 +27,7 @@ export const About: React.FC = () => {
             <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-4">
               Sobre a Trinity
             </h2>
-            <h3 className="text-3xl md:text-4xl font-serif font-bold text-white mb-6">
+            <h3 className="text-3xl md:text-4xl font-cyber font-bold text-white mb-6">
               Criamos o inimaginável com precisão digital
             </h3>
             <p className="text-gray-300 text-lg leading-relaxed mb-6">

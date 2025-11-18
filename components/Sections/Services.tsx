@@ -71,7 +71,7 @@ export const Services: React.FC = () => {
        {/* Section Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
         <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">O que fazemos</h2>
-        <h3 className="text-3xl md:text-5xl font-serif font-bold text-white">Nosso Arsenal Criativo</h3>
+        <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">Nosso Arsenal Criativo</h3>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,7 +88,7 @@ export const Services: React.FC = () => {
               <span className="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
               Live Demo
             </div>
-            <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-2">
+            <h3 className="text-2xl md:text-3xl font-cyber font-bold text-white mb-2">
               Experimente o Futuro
             </h3>
             <p className="text-gray-400 text-sm max-w-md mx-auto">

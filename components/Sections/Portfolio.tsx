@@ -26,7 +26,7 @@ export const Portfolio: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div>
             <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">Cases de Sucesso</h2>
-            <h3 className="text-3xl md:text-5xl font-serif font-bold text-white">Portfólio Trinity</h3>
+            <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">Portfólio Trinity</h3>
           </div>
           
           {/* Filters */}
@@ -65,7 +65,7 @@ export const Portfolio: React.FC = () => {
                 <span className="text-gold-500 text-xs font-display uppercase tracking-widest mb-2 block">
                   {item.category}
                 </span>
-                <h4 className="text-white text-xl font-bold font-serif group-hover:text-gold-100 transition-colors">
+                <h4 className="text-white text-xl font-bold font-cyber group-hover:text-gold-100 transition-colors">
                   {item.title}
                 </h4>
               </div>
