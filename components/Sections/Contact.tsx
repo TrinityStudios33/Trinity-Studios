@@ -65,9 +65,18 @@ export const Contact: React.FC = () => {
                <label className="text-xs font-display uppercase tracking-widest text-gold-500">Tipo de Projeto</label>
                <select className="w-full bg-black/50 border border-white/10 focus:border-gold-500 text-gray-300 px-4 py-3 outline-none transition-colors">
                   <option>Produção de Vídeo</option>
-                  <option>Inteligência Artificial</option>
-                  <option>Identidade Visual</option>
+                  <option>Arquitetura</option>
                   <option>Animação 3D</option>
+                  <option>Animação 2D</option>
+                  <option>Criação de Músicas</option>
+                  <option>Narração</option>
+                  <option>Jingles</option>
+                  <option>Criação de Site</option>
+                  <option>Automação</option>
+                  <option>Consultoria</option>
+                  <option>Fotografia</option>
+                  <option>Social Media</option>
+                  <option>Cursos e Mentorias</option>
                   <option>Outro</option>
                </select>
             </div>

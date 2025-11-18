@@ -8,6 +8,7 @@ import { Portfolio } from './components/Sections/Portfolio';
 import { Process } from './components/Sections/Process';
 import { Contact } from './components/Sections/Contact';
 import { Footer } from './components/Layout/Footer';
+import { ChatWidget } from './components/Features/ChatWidget';
 
 const App: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const App: React.FC = () => {
       </main>
 
       <Footer />
+      <ChatWidget />
     </div>
   );
 };

@@ -24,9 +24,12 @@ interface ServiceCardProps {
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon: Icon }) => (
-  <div className="group relative p-8 bg-white/5 border border-white/5 hover:border-gold-500/50 transition-all duration-500 overflow-hidden">
+  <div className="group relative p-8 bg-white/5 border border-white/5 hover:border-gold-500/50 transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(212,175,55,0.15)]">
     {/* Hover Glow Background */}
     <div className="absolute inset-0 bg-gold-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    
+    {/* Dynamic Light Beam Effect */}
+    <div className="absolute top-0 -left-[150%] w-[120%] h-full bg-gradient-to-r from-transparent via-gold-500/10 to-transparent -skew-x-12 group-hover:left-[150%] transition-all duration-1000 ease-in-out z-0 pointer-events-none" />
     
     <div className="relative z-10">
       <div className="w-12 h-12 mb-6 text-gold-500 group-hover:text-white transition-colors duration-300">
