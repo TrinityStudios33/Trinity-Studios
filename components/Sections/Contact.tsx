@@ -51,7 +51,7 @@ ${formData.message}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 opacity-0 animate-fade-in-up">
           <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">Comece Agora</h2>
           <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white mb-6">Materialize sua Visão</h3>
           <p className="text-gray-400 max-w-lg mx-auto">
@@ -77,7 +77,7 @@ ${formData.message}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white/5 p-8 md:p-12 border border-white/10 backdrop-blur-sm rounded-sm mb-12 shadow-2xl">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-white/5 p-8 md:p-12 border border-white/10 backdrop-blur-sm rounded-sm mb-12 shadow-2xl opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-display uppercase tracking-widest text-gold-500">Nome</label>

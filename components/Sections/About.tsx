@@ -21,7 +21,7 @@ export const About: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           {/* Founder Image / Visual Element */}
-          <div className="relative order-2 lg:order-1 flex justify-center">
+          <div className="relative order-2 lg:order-1 flex justify-center opacity-0 animate-fade-in-left" style={{ animationDelay: '0.3s' }}>
              {/* Glow Effect */}
              <div className="absolute top-10 inset-x-10 bottom-0 bg-gold-500/20 blur-3xl rounded-full opacity-40 pointer-events-none"></div>
              
@@ -57,7 +57,7 @@ export const About: React.FC = () => {
           </div>
 
           {/* Text Content */}
-          <div className="order-1 lg:order-2">
+          <div className="order-1 lg:order-2 opacity-0 animate-fade-in-right" style={{ animationDelay: '0.5s' }}>
             <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-4">
               Nossa História
             </h2>

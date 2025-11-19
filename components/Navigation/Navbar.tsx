@@ -31,15 +31,17 @@ export const Navbar: React.FC = () => {
         navigate('/', { state: { targetId: target } });
       }
     } else {
-      // Route navigation (e.g. /portfolio)
+      // Route navigation (e.g. /portfolio, /ai-lab, /servicos)
       navigate(target);
     }
   };
 
   const navLinks = [
+    { name: 'Home', href: '#inicio', isAnchor: true },
     { name: 'Sobre', href: '#sobre', isAnchor: true },
-    { name: 'Serviços', href: '#servicos', isAnchor: true },
+    { name: 'Serviços', href: '/servicos', isAnchor: false },
     { name: 'Portfólio', href: '/portfolio', isAnchor: false },
+    { name: 'AI Lab', href: '/ai-lab', isAnchor: false },
     { name: 'Processo', href: '#processo', isAnchor: true },
     { name: 'Contato', href: '#contato', isAnchor: true },
   ];

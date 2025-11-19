@@ -18,24 +18,24 @@ export const Hero: React.FC = () => {
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-        <div className="inline-block mb-6 px-4 py-1 border border-gold-500/30 rounded-full bg-black/50 backdrop-blur-sm">
+        <div className="inline-block mb-6 px-4 py-1 border border-gold-500/30 rounded-full bg-black/50 backdrop-blur-sm opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <span className="text-gold-400 text-xs md:text-sm font-display tracking-[0.2em] uppercase">
             O futuro da produção audiovisual
           </span>
         </div>
         
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-cyber font-bold text-white mb-6 leading-tight">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-cyber font-bold text-white mb-6 leading-tight opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           Produção e tecnologia <br />
           <span className="text-transparent bg-clip-text bg-gold-gradient">que elevam seu projeto</span> <br />
           ao próximo nível
         </h1>
 
-        <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-400 font-light leading-relaxed">
+        <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-400 font-light leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
           Vídeo, inteligência artificial, pós-produção, identidade visual, trailers, 
           animação e ambientes em 3D criados com ferramentas avançadas.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
           <a 
             href="https://wa.me/5581999492208"
             target="_blank"
@@ -60,7 +60,7 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* Advantages Grid */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center border-t border-white/10 pt-10">
+        <div className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center border-t border-white/10 pt-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
           {['Alta Qualidade', 'Produção com IA', 'Entrega Rápida', 'Estética Unificada', 'Custo Eficiente', 'Equipe Expert'].map((item) => (
             <div key={item} className="flex flex-col items-center justify-center p-2">
                <div className="w-1.5 h-1.5 bg-gold-500 rounded-full mb-3 shadow-[0_0_10px_#D4AF37]"></div>

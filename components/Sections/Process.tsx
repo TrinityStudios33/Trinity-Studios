@@ -16,14 +16,14 @@ export const Process: React.FC = () => {
        <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold-500/20 to-transparent hidden lg:block"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-20">
+        <div className="text-center mb-20 opacity-0 animate-fade-in-up">
            <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">Workflow</h2>
            <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">Processo de Criação</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-4">
           {steps.map((item, index) => (
-            <div key={index} className="relative flex flex-col items-center text-center group cursor-default">
+            <div key={index} className="relative flex flex-col items-center text-center group cursor-default opacity-0 animate-fade-in-up" style={{ animationDelay: `${(index + 1) * 0.2}s` }}>
               {/* Icon Circle with LED Effect */}
               <div className="w-16 h-16 rounded-full bg-black border border-gold-500/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10 transition-all duration-500 
                               group-hover:border-gold-400 group-hover:bg-gold-500 group-hover:shadow-[0_0_60px_rgba(212,175,55,0.6)] group-hover:scale-110">

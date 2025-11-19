@@ -15,9 +15,10 @@ import {
   Gamepad2,
   Images,
   Users,
-  LucideIcon 
+  LucideIcon,
+  ArrowRight
 } from 'lucide-react';
-import { VideoGenerator } from '../Features/VideoGenerator';
+import { useNavigate } from 'react-router-dom';
 
 interface ServiceCardProps {
   title: string;
@@ -52,8 +53,14 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, description, icon: Ico
   </div>
 );
 
-export const Services: React.FC = () => {
-  const services = [
+interface ServicesProps {
+  isPreview?: boolean;
+}
+
+export const Services: React.FC<ServicesProps> = ({ isPreview = false }) => {
+  const navigate = useNavigate();
+
+  const allServices = [
     {
       icon: Film,
       title: "Produção Audiovisual",
@@ -131,38 +138,45 @@ export const Services: React.FC = () => {
     }
   ];
 
+  // Filter services if in preview mode
+  const displayedServices = isPreview ? allServices.slice(0, 6) : allServices;
+
   return (
-    <section id="servicos" className="py-24 bg-zinc-950 relative scroll-mt-32">
+    <section id="servicos" className={`py-24 bg-zinc-950 relative ${isPreview ? 'scroll-mt-32' : 'pt-32'}`}>
        {/* Section Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center opacity-0 animate-fade-in-up">
         <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">O que fazemos</h2>
-        <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">Nosso Arsenal Criativo</h3>
+        <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">
+          {isPreview ? "Nosso Arsenal Criativo" : "Todas as Soluções Trinity"}
+        </h3>
+        {!isPreview && (
+          <p className="text-gray-400 max-w-2xl mx-auto mt-4">
+            Explore nossa lista completa de serviços projetados para elevar seu projeto ao nível máximo de excelência e tecnologia.
+          </p>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-          {services.map((service, index) => (
-            <ServiceCard key={index} {...service} />
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isPreview ? 'mb-12' : 'mb-20'}`}>
+          {displayedServices.map((service, index) => (
+            <div key={index} className="opacity-0 animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+              <ServiceCard {...service} />
+            </div>
           ))}
         </div>
 
-        {/* Interactive Lab Section */}
-        <div className="relative pt-12 border-t border-white/5">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-display uppercase tracking-widest mb-4">
-              <span className="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></span>
-              Live Demo
-            </div>
-            <h3 className="text-2xl md:text-3xl font-cyber font-bold text-white mb-2">
-              Trinity AI Lab
-            </h3>
-            <p className="text-gray-400 text-sm max-w-md mx-auto">
-              Explore o poder da criação generativa. Visualize conceitos, sintetize voz e crie atmosferas sonoras em tempo real.
-            </p>
+        {/* Show Button only in Preview Mode */}
+        {isPreview && (
+          <div className="text-center opacity-0 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+            <button 
+              onClick={() => navigate('/servicos')}
+              className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 text-white font-display font-bold uppercase tracking-widest hover:border-gold-500 hover:text-gold-500 transition-all duration-300 bg-black/50 hover:bg-black"
+            >
+              Todos os nossos serviços
+              <ArrowRight size={18} />
+            </button>
           </div>
-
-          <VideoGenerator />
-        </div>
+        )}
       </div>
     </section>
   );

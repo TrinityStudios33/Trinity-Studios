@@ -32,7 +32,7 @@ export const HomePage: React.FC = () => {
     <>
       <Hero />
       <About />
-      <Services />
+      <Services isPreview={true} />
       <Clients />
       <Process />
       <Contact />

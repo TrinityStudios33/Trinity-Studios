@@ -84,7 +84,7 @@ export const Portfolio: React.FC = () => {
   return (
     <section id="portfolio" className="py-12 bg-black relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 opacity-0 animate-fade-in-up">
           <div>
             <h2 className="text-gold-500 font-display text-sm uppercase tracking-[0.3em] mb-3">Cases de Sucesso</h2>
             <h3 className="text-3xl md:text-5xl font-cyber font-bold text-white">Portfólio Trinity</h3>
