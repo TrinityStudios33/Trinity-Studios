@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { VideoGenerator } from '../Features/VideoGenerator';
 import { Sparkles } from 'lucide-react';
+import { DecryptedText } from '../UI/DecryptedText';
 
 export const AiLabPage: React.FC = () => {
   useEffect(() => {
@@ -18,11 +19,11 @@ export const AiLabPage: React.FC = () => {
         <div className="text-center mb-16 opacity-0 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-display uppercase tracking-widest mb-6">
             <Sparkles size={14} />
-            <span>Intelligence Playground</span>
+            <span><DecryptedText text="Intelligence Playground" /></span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-cyber font-bold text-white mb-6">
-            Trinity <span className="text-transparent bg-clip-text bg-gold-gradient">AI Lab</span>
+            Trinity <span className="text-transparent bg-clip-text bg-gold-gradient"><DecryptedText text="AI Lab" /></span>
           </h1>
           
           <p className="text-gray-400 max-w-2xl mx-auto text-lg font-light leading-relaxed">

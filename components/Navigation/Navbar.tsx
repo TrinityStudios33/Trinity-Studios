@@ -31,7 +31,7 @@ export const Navbar: React.FC = () => {
         navigate('/', { state: { targetId: target } });
       }
     } else {
-      // Route navigation (e.g. /portfolio, /ai-lab, /servicos)
+      // Route navigation (e.g. /portfolio, /ai-lab, /servicos, /cursos)
       navigate(target);
     }
   };
@@ -41,7 +41,8 @@ export const Navbar: React.FC = () => {
     { name: 'Sobre', href: '#sobre', isAnchor: true },
     { name: 'Serviços', href: '/servicos', isAnchor: false },
     { name: 'Portfólio', href: '/portfolio', isAnchor: false },
-    { name: 'AI Lab', href: '/ai-lab', isAnchor: false },
+    { name: 'Laboratório', href: '/ai-lab', isAnchor: false },
+    { name: 'Cursos', href: '/cursos', isAnchor: false }, // Added Courses
     { name: 'Processo', href: '#processo', isAnchor: true },
     { name: 'Contato', href: '#contato', isAnchor: true },
   ];
@@ -64,13 +65,13 @@ export const Navbar: React.FC = () => {
           </a>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href, link.isAnchor)}
-                className="text-sm font-display tracking-widest uppercase text-gray-300 hover:text-gold-500 transition-colors duration-300 cursor-pointer"
+                className="text-xs lg:text-sm font-display tracking-widest uppercase text-gray-300 hover:text-gold-500 transition-colors duration-300 cursor-pointer"
               >
                 {link.name}
               </a>

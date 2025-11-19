@@ -6,6 +6,8 @@ import { HomePage } from './components/Pages/HomePage';
 import { PortfolioPage } from './components/Pages/PortfolioPage';
 import { AiLabPage } from './components/Pages/AiLabPage';
 import { ServicesPage } from './components/Pages/ServicesPage';
+import { CoursesPage } from './components/Pages/CoursesPage';
+import { CourseDetailPage } from './components/Pages/CourseDetailPage';
 import { Footer } from './components/Layout/Footer';
 import { ChatWidget } from './components/Features/ChatWidget';
 
@@ -23,6 +25,8 @@ const App: React.FC = () => {
             <Route path="/servicos" element={<ServicesPage />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/ai-lab" element={<AiLabPage />} />
+            <Route path="/cursos" element={<CoursesPage />} />
+            <Route path="/curso/:id" element={<CourseDetailPage />} />
           </Routes>
         </main>
 

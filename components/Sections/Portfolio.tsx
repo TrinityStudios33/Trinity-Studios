@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PortfolioItem } from '../../types';
 import { PlayCircle, X, Play } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const portfolioData: PortfolioItem[] = [
   { 
@@ -48,6 +49,24 @@ const categories = ['Todos', 'Vídeo', 'IA', '3D', 'Design', 'Documentários', '
 export const Portfolio: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [selectedProject, setSelectedProject] = useState<PortfolioItem | null>(null);
+  const location = useLocation();
+
+  // Auto-select category if passed via navigation state (e.g. from Services page)
+  useEffect(() => {
+    if (location.state && location.state.category) {
+      const targetCategory = location.state.category;
+      // Verify if category exists in our list to avoid empty states
+      if (categories.includes(targetCategory)) {
+        setActiveFilter(targetCategory);
+        
+        // Smooth scroll to portfolio section to ensure visibility
+        const element = document.getElementById('portfolio');
+        if (element) {
+            setTimeout(() => element.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+      }
+    }
+  }, [location]);
 
   const filteredItems = activeFilter === 'Todos' 
     ? portfolioData 
@@ -109,45 +128,52 @@ export const Portfolio: React.FC = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
-            <div 
-              key={item.id} 
-              onClick={() => item.videoUrl ? setSelectedProject(item) : null}
-              className={`group relative aspect-[4/3] overflow-hidden bg-gray-900 ${item.videoUrl ? 'cursor-pointer' : ''}`}
-            >
-              <img 
-                src={item.imageUrl} 
-                alt={item.title} 
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-              />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
-              
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                <span className="text-gold-500 text-xs font-display uppercase tracking-widest mb-2 block">
-                  {item.category}
-                </span>
-                <h4 className="text-white text-xl font-bold font-cyber group-hover:text-gold-100 transition-colors">
-                  {item.title}
-                </h4>
-              </div>
-
-              {/* Play Icon Center (Only if video exists) */}
-              {item.videoUrl && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                  <div className="w-16 h-16 rounded-full bg-gold-500/90 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)] group-hover:scale-110 transition-transform">
-                    <Play className="text-black fill-current ml-1" size={32} />
-                  </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item) => (
+                <div 
+                key={item.id} 
+                onClick={() => item.videoUrl ? setSelectedProject(item) : null}
+                className={`group relative aspect-[4/3] overflow-hidden bg-gray-900 ${item.videoUrl ? 'cursor-pointer' : ''}`}
+                >
+                <img 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
+                
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 p-6 w-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <span className="text-gold-500 text-xs font-display uppercase tracking-widest mb-2 block">
+                    {item.category}
+                    </span>
+                    <h4 className="text-white text-xl font-bold font-cyber group-hover:text-gold-100 transition-colors">
+                    {item.title}
+                    </h4>
                 </div>
-              )}
-              
-              {/* Border reveal */}
-              <div className="absolute inset-0 border-2 border-gold-500/0 group-hover:border-gold-500/50 transition-colors duration-500 pointer-events-none"></div>
+
+                {/* Play Icon Center (Only if video exists) */}
+                {item.videoUrl && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                    <div className="w-16 h-16 rounded-full bg-gold-500/90 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)] group-hover:scale-110 transition-transform">
+                        <Play className="text-black fill-current ml-1" size={32} />
+                    </div>
+                    </div>
+                )}
+                
+                {/* Border reveal */}
+                <div className="absolute inset-0 border-2 border-gold-500/0 group-hover:border-gold-500/50 transition-colors duration-500 pointer-events-none"></div>
+                </div>
+            ))
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center text-gray-500 py-20 border border-white/5 bg-white/5 rounded-lg">
+                <p className="font-display uppercase tracking-widest mb-2">Em Breve</p>
+                <p className="text-sm">Novos projetos de {activeFilter} sendo adicionados.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
 

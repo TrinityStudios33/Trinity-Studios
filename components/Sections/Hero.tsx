@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronRight, Play } from 'lucide-react';
+import { DecryptedText } from '../UI/DecryptedText';
 
 export const Hero: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -20,14 +21,16 @@ export const Hero: React.FC = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <div className="inline-block mb-6 px-4 py-1 border border-gold-500/30 rounded-full bg-black/50 backdrop-blur-sm opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <span className="text-gold-400 text-xs md:text-sm font-display tracking-[0.2em] uppercase">
-            O futuro da produção audiovisual
+            <DecryptedText text="O futuro da produção audiovisual" />
           </span>
         </div>
         
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-cyber font-bold text-white mb-6 leading-tight opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-          Produção e tecnologia <br />
-          <span className="text-transparent bg-clip-text bg-gold-gradient">que elevam seu projeto</span> <br />
-          ao próximo nível
+          <DecryptedText text="Produção e tecnologia" className="block" />
+          <span className="text-transparent bg-clip-text bg-gold-gradient">
+             <DecryptedText text="que elevam seu projeto" />
+          </span> <br />
+          <DecryptedText text="ao próximo nível" />
         </h1>
 
         <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-400 font-light leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
@@ -64,7 +67,9 @@ export const Hero: React.FC = () => {
           {['Alta Qualidade', 'Produção com IA', 'Entrega Rápida', 'Estética Unificada', 'Custo Eficiente', 'Equipe Expert'].map((item) => (
             <div key={item} className="flex flex-col items-center justify-center p-2">
                <div className="w-1.5 h-1.5 bg-gold-500 rounded-full mb-3 shadow-[0_0_10px_#D4AF37]"></div>
-               <span className="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-display">{item}</span>
+               <span className="text-gray-400 text-xs md:text-sm uppercase tracking-wider font-display">
+                 <DecryptedText text={item} />
+               </span>
             </div>
           ))}
         </div>

@@ -1,14 +1,14 @@
 import React from 'react';
 
 const CLIENT_LOGOS = [
-  "https://i.postimg.cc/dVBPzXPG/1.png",
-  "https://i.postimg.cc/wBj8HVgL/2.png",
-  "https://i.postimg.cc/5t2d13bw/3.png",
-  "https://i.postimg.cc/FKH5mZNp/4.png",
-  "https://i.postimg.cc/XvYS384k/5.png",
-  "https://i.postimg.cc/q7vV0L4Y/6.png",
-  "https://i.postimg.cc/CKxTYNSX/7.png",
-  "https://i.postimg.cc/zfGZ5j84/8.png"
+  "https://i.postimg.cc/JhPwn48S/1.png",
+  "https://i.postimg.cc/vBBJ6F8X/2.png",
+  "https://i.postimg.cc/k440t3Mh/3.png",
+  "https://i.postimg.cc/C113fTMv/4.png",
+  "https://i.postimg.cc/nzzyQbVS/5.png",
+  "https://i.postimg.cc/bJJ72cY4/6.png",
+  "https://i.postimg.cc/1ttkNh5Z/7.png",
+  "https://i.postimg.cc/Y995mKqK/8.png"
 ];
 
 export const Clients: React.FC = () => {
@@ -19,7 +19,7 @@ export const Clients: React.FC = () => {
       <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 mb-8 text-center opacity-0 animate-fade-in-up">
-        <p className="text-gold-500 text-xs font-display uppercase tracking-[0.3em]">Empresas que confiam na Trinity</p>
+        <p className="text-gold-500 text-xs font-display uppercase tracking-[0.3em] animate-fade-in-up">Empresas que já trabalharam conosco</p>
       </div>
 
       <div className="relative flex overflow-x-hidden group">
@@ -31,7 +31,7 @@ export const Clients: React.FC = () => {
                 <img 
                   src={logo} 
                   alt={`Client ${index + 1}`} 
-                  className="w-full h-full object-contain grayscale opacity-60 transition-all duration-500 hover:grayscale-0 hover:opacity-100 hover:scale-110"
+                  className="w-full h-full object-contain opacity-80 transition-all duration-500 hover:opacity-100 hover:scale-110"
                 />
               </div>
             </div>
@@ -46,7 +46,7 @@ export const Clients: React.FC = () => {
                 <img 
                   src={logo} 
                   alt={`Client ${index + 1}`} 
-                  className="w-full h-full object-contain grayscale opacity-60 transition-all duration-500 hover:grayscale-0 hover:opacity-100 hover:scale-110"
+                  className="w-full h-full object-contain opacity-80 transition-all duration-500 hover:opacity-100 hover:scale-110"
                 />
               </div>
             </div>
