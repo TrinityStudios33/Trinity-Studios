@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { 
   Sparkles, 
@@ -16,10 +16,13 @@ import {
   MessageSquareQuote,
   FileText,
   ArrowRight,
-  Copy
+  Copy,
+  Video,
+  LogIn,
+  AlertCircle
 } from 'lucide-react';
 
-type TabType = 'vision' | 'voice' | 'music' | 'script';
+type TabType = 'script' | 'vision' | 'video' | 'voice' | 'music';
 
 // Styles for Image Generation
 const VISUAL_STYLES = [
@@ -94,13 +97,26 @@ export const VideoGenerator: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
+  // --- VIDEO STATE (VEO) ---
+  const [videoPrompt, setVideoPrompt] = useState('');
+  const [isVeoGenerating, setIsVeoGenerating] = useState(false);
+  const [veoVideoUrl, setVeoVideoUrl] = useState<string | null>(null);
+  const [hasVeoKey, setHasVeoKey] = useState(false);
+  const [veoQuota, setVeoQuota] = useState(0);
+  const VEO_LIMIT = 3;
+
   // --- VOICE STATE ---
   const [voiceText, setVoiceText] = useState('');
   const [voiceTone, setVoiceTone] = useState('');
   const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[3]); // Default Kore
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false); // "Speaking" means generating now
   const [audioDownloadUrl, setAudioDownloadUrl] = useState<string | null>(null);
+  
+  // Voice Player State
+  const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
+  const [voiceCurrentTime, setVoiceCurrentTime] = useState(0);
+  const [voiceDuration, setVoiceDuration] = useState(0);
   
   // --- MUSIC STATE ---
   const [musicPrompt, setMusicPrompt] = useState('');
@@ -115,6 +131,36 @@ export const VideoGenerator: React.FC = () => {
   const [selectedPersona, setSelectedPersona] = useState(SCRIPT_PERSONAS[0]);
   const [generatedScript, setGeneratedScript] = useState('');
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
+
+  // --- EFFECTS ---
+  useEffect(() => {
+    checkApiKey();
+  }, []);
+
+  const checkApiKey = async () => {
+    if ((window as any).aistudio && (window as any).aistudio.hasSelectedApiKey) {
+      const hasKey = await (window as any).aistudio.hasSelectedApiKey();
+      setHasVeoKey(hasKey);
+    }
+  };
+
+  const handleVeoLogin = async () => {
+    if ((window as any).aistudio && (window as any).aistudio.openSelectKey) {
+      await (window as any).aistudio.openSelectKey();
+      // After selection, check again (handling potential race condition by assuming true if opened and closed, or polling)
+      setHasVeoKey(true); 
+    } else {
+      alert("Ambiente não suporta login direto. Por favor, contate o administrador.");
+    }
+  };
+
+  // --- HELPER: Time Formatting ---
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "00:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   // --- SCRIPT LOGIC ---
   const generateScript = async () => {
@@ -147,22 +193,14 @@ export const VideoGenerator: React.FC = () => {
 
   const handleSendToVoice = () => {
     if (!generatedScript) return;
-    
-    // Auto-select voice based on persona
     const personaVoice = VOICE_OPTIONS.find(v => v.id === selectedPersona.voiceId);
     if (personaVoice) setSelectedVoice(personaVoice);
-    
-    // Auto-set tone
     setVoiceTone(selectedPersona.tone);
-    
-    // Set text
     setVoiceText(generatedScript);
-    
-    // Switch Tab
     setActiveTab('voice');
   };
 
-  // --- VISION LOGIC (Gemini Nano Banana) ---
+  // --- VISION LOGIC ---
   const handleMagicBoost = () => {
     const enhancers = [
       "hyper-realistic, 8k resolution, ray tracing, volumetric fog, detailed texture",
@@ -180,24 +218,16 @@ export const VideoGenerator: React.FC = () => {
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      
-      // Construct a very strong system prompt for the user
       const finalPrompt = `Generate a high quality image of: ${imagePrompt}. 
       Art Style: ${selectedStyle.prompt}. 
       Requirements: No text overlay, high fidelity, detailed, photorealistic or stylized as requested.`;
 
-      // Using gemini-2.5-flash-image (Nano Banana)
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
-        contents: {
-          parts: [{ text: finalPrompt }]
-        },
-        config: {
-          responseModalities: ["IMAGE"],
-        },
+        contents: { parts: [{ text: finalPrompt }] },
+        config: { responseModalities: ["IMAGE"] },
       });
 
-      // Extract image
       let base64ImageBytes = null;
       if (response.candidates?.[0]?.content?.parts) {
          for (const part of response.candidates[0].content.parts) {
@@ -209,23 +239,75 @@ export const VideoGenerator: React.FC = () => {
       }
 
       if (base64ImageBytes) {
-        const imageUrl = `data:image/png;base64,${base64ImageBytes}`;
-        setGeneratedImage(imageUrl);
+        setGeneratedImage(`data:image/png;base64,${base64ImageBytes}`);
       } else {
         throw new Error("No image data generated.");
       }
-
     } catch (error) {
       console.error("Image Gen Error", error);
-      alert("Erro ao gerar imagem. Tente novamente ou simplifique o prompt.");
+      alert("Erro ao gerar imagem. Tente novamente.");
     } finally {
       setIsGeneratingImage(false);
     }
   };
 
+  // --- VEO VIDEO LOGIC ---
+  const generateVeoVideo = async () => {
+    if (!videoPrompt) return;
+    if (veoQuota >= VEO_LIMIT) {
+        alert("Limite de 3 vídeos por sessão atingido.");
+        return;
+    }
+
+    setIsVeoGenerating(true);
+    setVeoVideoUrl(null);
+
+    try {
+      // Re-instantiate to ensure we use the user's selected key from the login process
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      let operation = await ai.models.generateVideos({
+        model: 'veo-3.1-fast-generate-preview',
+        prompt: videoPrompt,
+        config: {
+          numberOfVideos: 1,
+          resolution: '1080p',
+          aspectRatio: '16:9'
+        }
+      });
+
+      // Polling loop
+      while (!operation.done) {
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5s
+        operation = await ai.operations.getVideosOperation({ operation: operation });
+      }
+
+      const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
+      
+      if (videoUri) {
+        // Append key to fetch the bytes
+        const authenticatedUrl = `${videoUri}&key=${process.env.API_KEY}`;
+        setVeoVideoUrl(authenticatedUrl);
+        setVeoQuota(prev => prev + 1);
+      } else {
+          throw new Error("Video generation completed but no URI returned.");
+      }
+
+    } catch (error) {
+      console.error("Veo Error:", error);
+      // Reset key state if it fails due to auth to prompt login again
+      if (JSON.stringify(error).includes("403") || JSON.stringify(error).includes("key")) {
+          setHasVeoKey(false);
+          alert("Sessão expirada ou chave inválida. Por favor, faça login novamente.");
+      } else {
+          alert("Erro na geração do vídeo. Tente um prompt diferente.");
+      }
+    } finally {
+      setIsVeoGenerating(false);
+    }
+  };
+
   // --- VOICE LOGIC (GEMINI TTS) ---
-  
-  // Helper: Create WAV blob from PCM data
   const createWavBlob = (samples: Int16Array, sampleRate: number = 24000) => {
     const buffer = new ArrayBuffer(44 + samples.length * 2);
     const view = new DataView(buffer);
@@ -241,12 +323,12 @@ export const VideoGenerator: React.FC = () => {
     writeString(view, 8, 'WAVE');
     writeString(view, 12, 'fmt ');
     view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM
-    view.setUint16(22, 1, true); // Mono
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
     view.setUint32(24, sampleRate, true);
     view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true); // Block align
-    view.setUint16(34, 16, true); // Bits per sample
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
     writeString(view, 36, 'data');
     view.setUint32(40, samples.length * 2, true);
 
@@ -260,7 +342,8 @@ export const VideoGenerator: React.FC = () => {
   const generateSpeech = async () => {
     if (!voiceText) return;
     setIsSpeaking(true);
-    setAudioDownloadUrl(null); // Reset previous download
+    setAudioDownloadUrl(null);
+    setIsVoicePlaying(false);
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -281,45 +364,49 @@ export const VideoGenerator: React.FC = () => {
       const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
       
       if (base64Audio) {
-        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
-        setAudioContext(ctx);
-        
         const buffer = base64ToArrayBuffer(base64Audio);
-        
-        // Create WAV for download
         const int16Data = new Int16Array(buffer);
         const wavBlob = createWavBlob(int16Data, 24000);
         const downloadUrl = URL.createObjectURL(wavBlob);
         setAudioDownloadUrl(downloadUrl);
-
-        // Decode and play
-        const audioBuffer = await decodeAudioData(
-          buffer,
-          ctx,
-          24000,
-          1
-        );
-
-        const source = ctx.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(ctx.destination);
-        source.start();
-        
-        source.onended = () => {
-            setIsSpeaking(false);
-        };
       } else {
          throw new Error("No audio data returned");
       }
 
     } catch (error) {
       console.error("TTS Error:", error);
-      setIsSpeaking(false);
       alert("Erro ao gerar voz. Verifique sua conexão.");
+    } finally {
+      setIsSpeaking(false);
     }
   };
 
-  // Audio Helpers
+  const toggleVoicePlay = () => {
+    if (!voiceAudioRef.current) return;
+    if (isVoicePlaying) {
+        voiceAudioRef.current.pause();
+    } else {
+        voiceAudioRef.current.play();
+    }
+    setIsVoicePlaying(!isVoicePlaying);
+  };
+
+  const handleVoiceTimeUpdate = () => {
+    if (voiceAudioRef.current) setVoiceCurrentTime(voiceAudioRef.current.currentTime);
+  };
+
+  const handleVoiceMetadata = () => {
+    if (voiceAudioRef.current) setVoiceDuration(voiceAudioRef.current.duration);
+  };
+
+  const handleVoiceSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (voiceAudioRef.current) {
+          const time = parseFloat(e.target.value);
+          voiceAudioRef.current.currentTime = time;
+          setVoiceCurrentTime(time);
+      }
+  };
+
   function base64ToArrayBuffer(base64: string) {
     const binaryString = window.atob(base64);
     const len = binaryString.length;
@@ -330,25 +417,6 @@ export const VideoGenerator: React.FC = () => {
     return bytes.buffer;
   }
 
-  async function decodeAudioData(
-    data: ArrayBuffer,
-    ctx: AudioContext,
-    sampleRate: number,
-    numChannels: number,
-  ): Promise<AudioBuffer> {
-    const dataInt16 = new Int16Array(data);
-    const frameCount = dataInt16.length / numChannels;
-    const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-    for (let channel = 0; channel < numChannels; channel++) {
-      const channelData = buffer.getChannelData(channel);
-      for (let i = 0; i < frameCount; i++) {
-        channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-      }
-    }
-    return buffer;
-  }
-
   // --- MUSIC LOGIC ---
   const generateMusic = async () => {
     if (!musicPrompt) return;
@@ -356,13 +424,11 @@ export const VideoGenerator: React.FC = () => {
     setMusicUrl(null);
     setIsPlayingMusic(false);
 
-    await new Promise(r => setTimeout(r, 2000)); // Simulate processing
+    await new Promise(r => setTimeout(r, 2000));
 
-    // Simple AI simulation: Keyword matching
     const lowerPrompt = musicPrompt.toLowerCase();
-    let selectedTrack = MUSIC_LIBRARY[0]; // Default
+    let selectedTrack = MUSIC_LIBRARY[0]; 
 
-    // Find best match
     for (const track of MUSIC_LIBRARY) {
         if (track.keywords.some(k => lowerPrompt.includes(k))) {
             selectedTrack = track;
@@ -377,11 +443,8 @@ export const VideoGenerator: React.FC = () => {
 
   const toggleMusicPlay = () => {
     if (!musicAudioRef.current) return;
-    if (isPlayingMusic) {
-      musicAudioRef.current.pause();
-    } else {
-      musicAudioRef.current.play();
-    }
+    if (isPlayingMusic) musicAudioRef.current.pause();
+    else musicAudioRef.current.play();
     setIsPlayingMusic(!isPlayingMusic);
   };
 
@@ -390,35 +453,36 @@ export const VideoGenerator: React.FC = () => {
       <div className="bg-black/90 rounded-lg p-6 md:p-8 relative overflow-hidden min-h-[600px] flex flex-col">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-white/10 pb-6 gap-4">
-          <div>
-            <h3 className="text-2xl font-cyber font-bold text-white uppercase tracking-wider flex items-center gap-3">
-              Trinity AI Lab <span className="text-xs font-sans font-normal text-gold-500 px-2 py-0.5 border border-gold-500/30 rounded-full bg-gold-500/10">V.2.1</span>
+        <div className="flex flex-col xl:flex-row justify-between items-center xl:items-center mb-8 border-b border-white/10 pb-6 gap-6">
+          <div className="text-center xl:text-left">
+            <h3 className="text-2xl font-cyber font-bold text-white uppercase tracking-wider flex items-center justify-center xl:justify-start gap-3">
+              Trinity AI Lab <span className="text-xs font-sans font-normal text-gold-500 px-2 py-0.5 border border-gold-500/30 rounded-full bg-gold-500/10">V.3.0</span>
             </h3>
             <p className="text-sm text-gray-400 font-light mt-1">
-              Playground de Inteligência Artificial Generativa.
+              Playground de Inteligência Artificial Generativa Multimodal.
             </p>
           </div>
 
-          {/* Tabs */}
-          <div className="flex flex-wrap gap-2 bg-zinc-900/80 p-1 rounded-lg border border-white/10">
+          {/* Tabs - Grid Layout for better fit */}
+          <div className="w-full xl:w-auto grid grid-cols-3 sm:grid-cols-5 gap-2 bg-zinc-900/80 p-1 rounded-lg border border-white/10">
             {[
               { id: 'script', icon: FileText, label: 'Roteiros' },
-              { id: 'vision', icon: ImageIcon, label: 'Criação de Imagens' },
+              { id: 'vision', icon: ImageIcon, label: 'Imagens' },
+              { id: 'video', icon: Video, label: 'Vídeo (Veo)' },
               { id: 'voice', icon: Mic, label: 'Voz' },
               { id: 'music', icon: Music, label: 'Música' },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as TabType)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-display uppercase tracking-widest transition-all ${
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-[10px] sm:text-xs font-display uppercase tracking-widest transition-all ${
                   activeTab === tab.id
                     ? 'bg-gold-500 text-black shadow-lg font-bold'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <tab.icon size={14} />
-                {tab.label}
+                <tab.icon size={14} className="hidden sm:block" />
+                <span className="truncate">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -454,21 +518,16 @@ export const VideoGenerator: React.FC = () => {
                       ))}
                    </div>
                 </div>
-
                 <div className="space-y-2">
                   <label className="text-xs font-display uppercase tracking-widest text-gold-500">Tópico do Vídeo</label>
                   <textarea
                     value={scriptTopic}
                     onChange={(e) => setScriptTopic(e.target.value)}
-                    placeholder="Ex: Como usar IA para vender mais, Lançamento de tênis esportivo..."
+                    placeholder="Ex: Como usar IA para vender mais..."
                     className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
                   />
                 </div>
-                <button
-                  onClick={generateScript}
-                  disabled={isGeneratingScript || !scriptTopic}
-                  className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
-                >
+                <button onClick={generateScript} disabled={isGeneratingScript || !scriptTopic} className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50">
                   {isGeneratingScript ? 'Escrevendo...' : 'Gerar Roteiro'}
                 </button>
               </div>
@@ -477,8 +536,6 @@ export const VideoGenerator: React.FC = () => {
             {/* VISION CONTROLS */}
             {activeTab === 'vision' && (
               <div className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-300">
-                
-                {/* Style Selector */}
                 <div className="space-y-2">
                    <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex items-center gap-2">
                       <Settings2 size={12} /> Estilo de Renderização
@@ -499,35 +556,84 @@ export const VideoGenerator: React.FC = () => {
                       ))}
                    </div>
                 </div>
-
                 <div className="space-y-2">
                   <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex justify-between items-center">
                     Seu Prompt
-                    <button onClick={handleMagicBoost} className="text-xs flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors" title="Melhorar Prompt com IA">
-                      <Wand2 size={12} /> Melhorar Prompt
+                    <button onClick={handleMagicBoost} className="text-xs flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors">
+                      <Wand2 size={12} /> Melhorar
                     </button>
                   </label>
                   <textarea
                     value={imagePrompt}
                     onChange={(e) => setImagePrompt(e.target.value)}
-                    placeholder="Descreva o que você quer criar... (Ex: Um astronauta andando em Marte)"
-                    className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none resize-none text-sm font-light"
+                    placeholder="Descreva o que você quer criar..."
+                    className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
                   />
                 </div>
-                <button
-                  onClick={generateImage}
-                  disabled={isGeneratingImage || !imagePrompt}
-                  className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
-                >
+                <button onClick={generateImage} disabled={isGeneratingImage || !imagePrompt} className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50">
                   {isGeneratingImage ? 'Gerando Imagem...' : 'Gerar Conceito'}
                 </button>
+              </div>
+            )}
+
+            {/* VEO VIDEO CONTROLS */}
+            {activeTab === 'video' && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-300">
+                 
+                 {!hasVeoKey ? (
+                    <div className="bg-zinc-900/80 border border-gold-500/20 p-6 rounded-sm text-center space-y-4">
+                        <div className="w-12 h-12 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto">
+                            <User className="text-gold-500" size={24} />
+                        </div>
+                        <h4 className="text-white font-display uppercase tracking-widest font-bold">Login Necessário</h4>
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                            Para gerar vídeos com o <strong>Google Veo</strong>, você precisa fazer login com sua conta Google. Isso utilizará sua própria cota de testes do Gemini API.
+                        </p>
+                        <button 
+                            onClick={handleVeoLogin}
+                            className="w-full py-3 flex items-center justify-center gap-2 bg-white text-black font-bold font-display uppercase tracking-widest hover:bg-gray-200 transition-all rounded-sm"
+                        >
+                            <LogIn size={16} /> Login com Google
+                        </button>
+                        <p className="text-[9px] text-gray-500">
+                            Seus dados são processados diretamente pelo Google.
+                        </p>
+                    </div>
+                 ) : (
+                    <>
+                        <div className="space-y-2">
+                            <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex justify-between">
+                                Prompt do Vídeo (Inglês recomendado)
+                                <span className="text-[10px] text-gray-400">Cota: {veoQuota}/{VEO_LIMIT}</span>
+                            </label>
+                            <textarea
+                                value={videoPrompt}
+                                onChange={(e) => setVideoPrompt(e.target.value)}
+                                placeholder="Ex: A cinematic drone shot of a futuristic cyberpunk city with neon lights and flying cars, rain, 8k..."
+                                className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
+                            />
+                        </div>
+                        <button
+                            onClick={generateVeoVideo}
+                            disabled={isVeoGenerating || !videoPrompt || veoQuota >= VEO_LIMIT}
+                            className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
+                        >
+                            {isVeoGenerating ? 'Renderizando Veo...' : 'Gerar Vídeo (Veo 3)'}
+                        </button>
+                        <div className="flex items-start gap-2 p-3 bg-blue-900/20 border border-blue-500/20 rounded-sm">
+                            <AlertCircle size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-[10px] text-blue-300 leading-relaxed">
+                                <strong>Modo Experimental:</strong> A geração pode levar até 1-2 minutos. O vídeo será exibido ao lado assim que concluído.
+                            </p>
+                        </div>
+                    </>
+                 )}
               </div>
             )}
 
             {/* VOICE CONTROLS */}
             {activeTab === 'voice' && (
               <div className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-300">
-                {/* Voice Selection */}
                 <div className="space-y-2">
                    <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex items-center gap-2">
                       <User size={12} /> Selecione a Voz
@@ -549,8 +655,6 @@ export const VideoGenerator: React.FC = () => {
                       ))}
                    </div>
                 </div>
-
-                {/* Tone Input */}
                 <div className="space-y-2">
                     <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex items-center gap-2">
                         <MessageSquareQuote size={12} /> Tom da Narrativa
@@ -559,11 +663,10 @@ export const VideoGenerator: React.FC = () => {
                         type="text"
                         value={voiceTone}
                         onChange={(e) => setVoiceTone(e.target.value)}
-                        placeholder="Ex: Engraçado, Comercial, Sério, Irônico..."
-                        className="w-full bg-zinc-900/50 border border-white/10 rounded-sm px-4 py-2 text-white focus:border-gold-500 outline-none text-sm font-light transition-all focus:ring-1 focus:ring-gold-500/20"
+                        placeholder="Ex: Engraçado, Comercial, Sério..."
+                        className="w-full bg-zinc-900/50 border border-white/10 rounded-sm px-4 py-2 text-white focus:border-gold-500 outline-none text-sm font-light"
                     />
                 </div>
-
                 <div className="space-y-2">
                   <label className="text-xs font-display uppercase tracking-widest text-gold-500">Texto para Falar</label>
                   <textarea
@@ -573,13 +676,7 @@ export const VideoGenerator: React.FC = () => {
                     className="w-full h-28 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
                   />
                 </div>
-                <button
-                  onClick={generateSpeech}
-                  disabled={!voiceText || isSpeaking}
-                  className={`w-full py-4 font-bold font-display uppercase tracking-widest transition-all ${
-                    isSpeaking ? 'bg-gold-500/50 text-black cursor-not-allowed' : 'bg-gold-500 text-black hover:bg-white'
-                  }`}
-                >
+                <button onClick={generateSpeech} disabled={!voiceText || isSpeaking} className={`w-full py-4 font-bold font-display uppercase tracking-widest transition-all ${isSpeaking ? 'bg-gold-500/50 text-black cursor-not-allowed' : 'bg-gold-500 text-black hover:bg-white'}`}>
                   {isSpeaking ? 'Sintetizando...' : 'Gerar Voz'}
                 </button>
               </div>
@@ -593,27 +690,19 @@ export const VideoGenerator: React.FC = () => {
                     <textarea
                        value={musicPrompt}
                        onChange={(e) => setMusicPrompt(e.target.value)}
-                       placeholder="Descreva a atmosfera musical (Ex: Trilha épica de batalha, piano triste, rock agressivo, lofi relaxante...)"
+                       placeholder="Descreva a atmosfera musical..."
                        className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
                     />
                  </div>
-                 <button
-                  onClick={generateMusic}
-                  disabled={isGeneratingMusic || !musicPrompt}
-                  className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
-                >
+                 <button onClick={generateMusic} disabled={isGeneratingMusic || !musicPrompt} className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50">
                   {isGeneratingMusic ? 'Compondo...' : 'Gerar Trilha Sonora'}
                 </button>
-                <p className="text-[10px] text-gray-500 text-center">Simulador de Composição por IA</p>
               </div>
             )}
-
           </div>
 
           {/* RIGHT PANEL: Display */}
-          <div className="w-full lg:w-2/3 bg-black border border-white/10 rounded-sm relative overflow-hidden flex items-center justify-center min-h-[300px] group">
-            
-            {/* Background Grid */}
+          <div className="w-full lg:w-2/3 bg-black border border-white/10 rounded-sm relative overflow-hidden flex items-center justify-center min-h-[300px]">
             <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20 z-10"></div>
             
             {/* SCRIPT DISPLAY */}
@@ -627,29 +716,20 @@ export const VideoGenerator: React.FC = () => {
                   ) : generatedScript ? (
                      <div className="relative w-full h-full flex flex-col z-20">
                         <div className="flex justify-between items-center mb-4">
-                           <span className="text-xs font-display uppercase tracking-widest text-gray-400">Roteiro Gerado ({selectedPersona.label})</span>
-                           <button 
-                              onClick={() => {navigator.clipboard.writeText(generatedScript);}}
-                              className="p-2 bg-black/50 hover:bg-gold-500 hover:text-black rounded transition-colors text-gray-400"
-                              title="Copiar"
-                           >
-                              <Copy size={16} />
-                           </button>
+                           <span className="text-xs font-display uppercase tracking-widest text-gray-400">Roteiro Gerado</span>
+                           <button onClick={() => navigator.clipboard.writeText(generatedScript)} className="p-2 hover:bg-gold-500 hover:text-black rounded transition-colors text-gray-400"><Copy size={16} /></button>
                         </div>
                         <div className="flex-1 bg-black/40 border border-white/5 p-4 rounded-sm overflow-y-auto text-sm leading-relaxed text-gray-200 font-light whitespace-pre-wrap mb-4">
                            {generatedScript}
                         </div>
-                        <button 
-                           onClick={handleSendToVoice}
-                           className="flex items-center justify-center gap-2 w-full py-3 bg-green-600/20 border border-green-500/50 text-green-400 font-bold font-display uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all"
-                        >
-                           <Mic size={16} /> Narrar com IA (Voz Automática) <ArrowRight size={16} />
+                        <button onClick={handleSendToVoice} className="flex items-center justify-center gap-2 w-full py-3 bg-green-600/20 border border-green-500/50 text-green-400 font-bold font-display uppercase tracking-widest hover:bg-green-500 hover:text-black transition-all">
+                           <Mic size={16} /> Narrar com IA <ArrowRight size={16} />
                         </button>
                      </div>
                   ) : (
                      <div className="text-center opacity-30">
                         <FileText size={64} className="mx-auto mb-4 text-white" />
-                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Tópico do Roteiro</p>
+                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Tópico</p>
                      </div>
                   )}
                </div>
@@ -662,22 +742,49 @@ export const VideoGenerator: React.FC = () => {
                      <div className="text-center z-20">
                         <Loader2 size={48} className="text-gold-500 animate-spin mb-4 mx-auto" />
                         <p className="text-gold-500 text-xs uppercase tracking-widest animate-pulse">Renderizando Pixels...</p>
-                        <p className="text-gray-500 text-[10px] mt-2">Isso pode levar alguns segundos</p>
                      </div>
                   ) : generatedImage ? (
                      <div className="relative w-full h-full flex items-center justify-center bg-black">
                         <img src={generatedImage} alt="AI Generated" className="max-w-full max-h-full object-contain" />
-                        <a href={generatedImage} download="trinity-generated.png" className="absolute bottom-4 right-4 p-2 bg-black/80 text-white rounded-full hover:bg-gold-500 hover:text-black transition-colors z-30 border border-white/20">
-                           <Download size={20} />
-                        </a>
-                        <div className="absolute top-4 left-4 px-3 py-1 bg-black/60 backdrop-blur rounded border border-white/10 text-[10px] text-gold-500 uppercase tracking-widest">
-                            Estilo: {selectedStyle.label}
-                        </div>
+                        <a href={generatedImage} download="trinity-generated.png" className="absolute bottom-4 right-4 p-2 bg-black/80 text-white rounded-full hover:bg-gold-500 hover:text-black transition-colors z-30 border border-white/20"><Download size={20} /></a>
                      </div>
                   ) : (
                      <div className="text-center opacity-30">
                         <ImageIcon size={64} className="mx-auto mb-4 text-white" />
-                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Prompt Visual</p>
+                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Prompt</p>
+                     </div>
+                  )}
+               </div>
+            )}
+
+            {/* VEO VIDEO DISPLAY */}
+            {activeTab === 'video' && (
+               <div className="relative w-full h-full flex items-center justify-center bg-zinc-900">
+                  {isVeoGenerating ? (
+                     <div className="text-center z-20 p-8">
+                        <Loader2 size={48} className="text-gold-500 animate-spin mb-6 mx-auto" />
+                        <p className="text-gold-500 text-sm font-cyber tracking-widest animate-pulse mb-2">GERANDO VÍDEO COM VEO</p>
+                        <p className="text-gray-500 text-xs max-w-xs mx-auto leading-relaxed">
+                           Isso pode levar de 1 a 2 minutos. A IA está calculando física, luz e movimento...
+                        </p>
+                     </div>
+                  ) : veoVideoUrl ? (
+                     <div className="relative w-full h-full flex items-center justify-center bg-black">
+                         <video 
+                            src={veoVideoUrl} 
+                            controls 
+                            autoPlay 
+                            loop 
+                            className="max-w-full max-h-full"
+                         />
+                     </div>
+                  ) : (
+                     <div className="text-center opacity-30 flex flex-col items-center">
+                        <div className="w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center mb-4">
+                             <Video size={40} className="text-white" />
+                        </div>
+                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Geração VEO</p>
+                        {!hasVeoKey && <p className="text-xs text-red-400 mt-2">Faça login para começar</p>}
                      </div>
                   )}
                </div>
@@ -687,41 +794,36 @@ export const VideoGenerator: React.FC = () => {
             {activeTab === 'voice' && (
                <div className="relative w-full h-full flex flex-col items-center justify-center bg-zinc-900 p-8">
                   {isSpeaking ? (
-                     <div className="flex items-center gap-1 h-32">
-                        {[...Array(20)].map((_, i) => (
-                           <div 
-                              key={i} 
-                              className="w-2 bg-gold-500 rounded-full animate-[bounce_0.5s_infinite]"
-                              style={{ 
-                                 height: `${Math.random() * 100}%`,
-                                 animationDelay: `${i * 0.05}s` 
-                              }}
-                           ></div>
-                        ))}
+                     <div className="flex flex-col items-center gap-4 z-20">
+                        <Loader2 size={48} className="text-gold-500 animate-spin" />
+                        <p className="text-gold-500 text-xs uppercase tracking-widest animate-pulse">Sintetizando Áudio...</p>
+                     </div>
+                  ) : audioDownloadUrl ? (
+                     <div className="relative w-full max-w-md z-20 bg-black/80 border border-white/10 rounded-lg p-6 flex flex-col gap-4">
+                        <div className="flex items-center gap-4">
+                            <button onClick={toggleVoicePlay} className="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center text-black hover:scale-105 transition-transform">
+                                {isVoicePlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
+                            </button>
+                            <div className="flex-1">
+                                <h4 className="text-white font-display uppercase tracking-wider text-sm mb-1">Voz Gerada</h4>
+                                <p className="text-gray-500 text-xs">{selectedVoice.label}</p>
+                            </div>
+                            <a href={audioDownloadUrl} download="voice.wav" className="p-2 text-gray-400 hover:text-gold-500 transition-colors"><Download size={20} /></a>
+                        </div>
+                        <div className="space-y-2">
+                            <input type="range" min="0" max={voiceDuration || 100} value={voiceCurrentTime} onChange={handleVoiceSeek} className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gold-500"/>
+                            <div className="flex justify-between text-[10px] text-gray-500 font-mono">
+                                <span>{formatTime(voiceCurrentTime)}</span>
+                                <span>{formatTime(voiceDuration)}</span>
+                            </div>
+                        </div>
+                        <audio ref={voiceAudioRef} src={audioDownloadUrl} onTimeUpdate={handleVoiceTimeUpdate} onLoadedMetadata={handleVoiceMetadata} onEnded={() => setIsVoicePlaying(false)} autoPlay />
                      </div>
                   ) : (
                      <div className="text-center opacity-30">
                         <Mic size={64} className="mx-auto mb-4 text-white" />
                         <p className="font-display uppercase tracking-widest text-sm">Aguardando Texto</p>
-                        <p className="text-xs text-gray-500 mt-2">Voz Selecionada: {selectedVoice.label}</p>
-                        {voiceTone && <p className="text-[10px] text-gold-500/70 mt-1">Tom: {voiceTone}</p>}
                      </div>
-                  )}
-                  
-                  <div className="absolute bottom-8 font-mono text-gold-500/50 text-xs">
-                     {isSpeaking ? `AUDIO SYNTHESIS ACTIVE: ${selectedVoice.id.toUpperCase()}` : "SYSTEM READY"}
-                  </div>
-
-                  {/* Download Button for Audio */}
-                  {!isSpeaking && audioDownloadUrl && (
-                    <a 
-                      href={audioDownloadUrl} 
-                      download={`trinity-voice-${Date.now()}.wav`}
-                      className="absolute bottom-4 right-4 p-2 bg-black/80 text-white rounded-full hover:bg-gold-500 hover:text-black transition-colors z-30 border border-white/20"
-                      title="Baixar Áudio"
-                    >
-                       <Download size={20} />
-                    </a>
                   )}
                </div>
             )}
@@ -732,33 +834,25 @@ export const VideoGenerator: React.FC = () => {
                   {isGeneratingMusic ? (
                      <div className="text-center z-20">
                         <Loader2 size={48} className="text-gold-500 animate-spin mb-4 mx-auto" />
-                        <p className="text-gold-500 text-xs uppercase tracking-widest animate-pulse">Analisando Prompt & Compondo...</p>
+                        <p className="text-gold-500 text-xs uppercase tracking-widest animate-pulse">Compondo...</p>
                      </div>
                   ) : musicUrl ? (
                      <div className="text-center z-20 w-full max-w-xs">
                         <div className="w-40 h-40 rounded-full border-4 border-gold-500/30 mx-auto mb-8 flex items-center justify-center relative bg-black shadow-[0_0_50px_rgba(212,175,55,0.2)]">
-                           {isPlayingMusic && (
-                              <div className="absolute inset-0 rounded-full border-4 border-gold-500 border-t-transparent animate-spin"></div>
-                           )}
+                           {isPlayingMusic && <div className="absolute inset-0 rounded-full border-4 border-gold-500 border-t-transparent animate-spin"></div>}
                            <Music size={56} className={`text-gold-500 ${isPlayingMusic ? 'animate-pulse' : ''}`} />
                         </div>
-                        
                         <h4 className="text-white font-cyber text-xl mb-2">{currentMood}</h4>
-                        <p className="text-gray-500 text-xs mb-6">AI Generated Concept Track</p>
-
-                        <button 
-                           onClick={toggleMusicPlay}
-                           className="p-4 rounded-full bg-gold-500 text-black hover:bg-white hover:scale-110 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)]"
-                        >
+                        <p className="text-gray-500 text-xs mb-6">AI Generated Track</p>
+                        <button onClick={toggleMusicPlay} className="p-4 rounded-full bg-gold-500 text-black hover:bg-white hover:scale-110 transition-all shadow-[0_0_20px_rgba(212,175,55,0.4)]">
                            {isPlayingMusic ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
                         </button>
-
                         <audio ref={musicAudioRef} src={musicUrl} onEnded={() => setIsPlayingMusic(false)} />
                      </div>
                   ) : (
                      <div className="text-center opacity-30">
                         <Volume2 size={64} className="mx-auto mb-4 text-white" />
-                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Descrição Musical</p>
+                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Prompt Musical</p>
                      </div>
                   )}
                </div>
@@ -766,7 +860,6 @@ export const VideoGenerator: React.FC = () => {
 
           </div>
         </div>
-
       </div>
     </div>
   );
