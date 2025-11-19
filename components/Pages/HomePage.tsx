@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Hero } from '../Sections/Hero';
 import { About } from '../Sections/About';
 import { Services } from '../Sections/Services';
+import { Clients } from '../Sections/Clients';
 import { Process } from '../Sections/Process';
 import { Contact } from '../Sections/Contact';
 
@@ -32,6 +33,7 @@ export const HomePage: React.FC = () => {
       <Hero />
       <About />
       <Services />
+      <Clients />
       <Process />
       <Contact />
     </>
