@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Logo } from '../UI/Logo';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -12,21 +15,33 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, target: string, isAnchor: boolean) => {
     e.preventDefault();
     setIsOpen(false);
-    const element = document.querySelector(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+
+    if (isAnchor) {
+      // If it's the home route (check for both empty string and slash in HashRouter)
+      if (location.pathname === '/' || location.pathname === '') {
+        const element = document.querySelector(target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // Navigate to home and pass the target ID in state to trigger scroll after load
+        navigate('/', { state: { targetId: target } });
+      }
+    } else {
+      // Route navigation (e.g. /portfolio)
+      navigate(target);
     }
   };
 
   const navLinks = [
-    { name: 'Sobre', href: '#sobre' },
-    { name: 'Serviços', href: '#servicos' },
-    { name: 'Portfólio', href: '#portfolio' },
-    { name: 'Processo', href: '#processo' },
-    { name: 'Contato', href: '#contato' },
+    { name: 'Sobre', href: '#sobre', isAnchor: true },
+    { name: 'Serviços', href: '#servicos', isAnchor: true },
+    { name: 'Portfólio', href: '/portfolio', isAnchor: false },
+    { name: 'Processo', href: '#processo', isAnchor: true },
+    { name: 'Contato', href: '#contato', isAnchor: true },
   ];
 
   return (
@@ -40,8 +55,8 @@ export const Navbar: React.FC = () => {
           {/* Logo Anchor to Top */}
           <a 
             href="#inicio" 
-            onClick={(e) => handleNavClick(e, '#inicio')}
-            className="flex-shrink-0"
+            onClick={(e) => handleNavClick(e, '#inicio', true)}
+            className="flex-shrink-0 cursor-pointer"
           >
             <Logo className="h-10 md:h-12" />
           </a>
@@ -52,8 +67,8 @@ export const Navbar: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-sm font-display tracking-widest uppercase text-gray-300 hover:text-gold-500 transition-colors duration-300"
+                onClick={(e) => handleNavClick(e, link.href, link.isAnchor)}
+                className="text-sm font-display tracking-widest uppercase text-gray-300 hover:text-gold-500 transition-colors duration-300 cursor-pointer"
               >
                 {link.name}
               </a>
@@ -90,8 +105,8 @@ export const Navbar: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="block px-3 py-2 text-base font-display uppercase tracking-wider text-gray-300 hover:text-gold-500 hover:bg-white/5"
+                onClick={(e) => handleNavClick(e, link.href, link.isAnchor)}
+                className="block px-3 py-2 text-base font-display uppercase tracking-wider text-gray-300 hover:text-gold-500 hover:bg-white/5 cursor-pointer"
               >
                 {link.name}
               </a>

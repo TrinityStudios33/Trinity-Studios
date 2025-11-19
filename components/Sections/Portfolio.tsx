@@ -82,7 +82,7 @@ export const Portfolio: React.FC = () => {
   };
 
   return (
-    <section id="portfolio" className="py-24 bg-black border-t border-white/5 scroll-mt-32">
+    <section id="portfolio" className="py-12 bg-black relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div>

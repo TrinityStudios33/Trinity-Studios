@@ -12,7 +12,7 @@ export const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'model', text: 'Olá. Sou o Agente treinado pela equipe Trinity, vamos montar seu projeto?' }
+    { id: '1', role: 'model', text: 'E aí, beleza? Sou o assistente virtual da Trinity. Bora tirar aquele projeto do papel?' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,7 @@ export const ChatWidget: React.FC = () => {
       chatSessionRef.current = ai.chats.create({
         model: 'gemini-3-pro-preview',
         config: {
-          systemInstruction: `Você é a Trinity AI, assistente virtual da Trinity Studios.
+          systemInstruction: `Você é o Trinity Bro, o assistente virtual parceiro da Trinity Studios.
           
           SOBRE A TRINITY STUDIOS:
           Somos um estúdio de produção audiovisual futurista que une criatividade, técnica e inteligência artificial.
@@ -51,11 +51,15 @@ export const ChatWidget: React.FC = () => {
           7. Gestão e Social Media
           8. Fotografia Profissional e com IA
           9. Desenvolvimento Web (Sites cinematográficos)
-          10. Consultoria Criativa, Cursos e Mentorias.
+          10. Consultoria Criativa, Cursos e Networking.
+          11. Desenvolvimento de Jogos (Unreal Engine 5)
+          12. Banco de Imagens Gratuito.
 
           TOM DE VOZ:
-          Futurista, profissional, elegante, prestativo e conciso. Use termos como "Elevar o nível", "Experiência visual", "Inovação".
-          Se perguntarem preços, peça para solicitarem um orçamento via WhatsApp ou formulário de contato.
+          Amigável, casual, parceiro, "brother". Fale como um amigo próximo, mas mantenha o conhecimento profissional.
+          Use gírias leves se apropriado (cara, mano, beleza, bora).
+          Seja prestativo e incentive o usuário a criar algo incrível.
+          Se perguntarem preços, diga de forma descontraída: "Cara, me chama no WhatsApp que a gente troca uma ideia melhor sobre valores! O link tá ali no menu."
           Seja breve nas respostas.`,
         },
       });
@@ -81,7 +85,7 @@ export const ChatWidget: React.FC = () => {
         setMessages(prev => [...prev, { 
           id: (Date.now() + 1).toString(), 
           role: 'model', 
-          text: text || "Desculpe, tive uma falha nos circuitos. Poderia repetir?" 
+          text: text || "Putz, deu um bug aqui nos circuitos. Manda de novo?" 
         }]);
       }
     } catch (error) {
@@ -89,7 +93,7 @@ export const ChatWidget: React.FC = () => {
       setMessages(prev => [...prev, { 
         id: (Date.now() + 1).toString(), 
         role: 'model', 
-        text: "Erro de conexão com o servidor neural. Tente novamente em instantes." 
+        text: "Eita, perdi a conexão com a nave mãe. Tenta de novo daqui a pouco!" 
       }]);
     } finally {
       setIsLoading(false);
@@ -168,7 +172,7 @@ export const ChatWidget: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Digite sua dúvida..."
+                placeholder="Manda sua mensagem..."
                 className="w-full bg-zinc-900/50 text-white text-sm rounded-full pl-4 pr-12 py-3 border border-white/10 focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 outline-none transition-all placeholder-gray-600"
               />
               <button 
@@ -178,9 +182,6 @@ export const ChatWidget: React.FC = () => {
               >
                 <Send size={16} />
               </button>
-            </div>
-            <div className="text-center mt-2">
-               <span className="text-[10px] text-gray-600">Powered by Gemini 3 Pro</span>
             </div>
           </div>
         </div>

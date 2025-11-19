@@ -154,10 +154,10 @@ export const Services: React.FC = () => {
               Live Demo
             </div>
             <h3 className="text-2xl md:text-3xl font-cyber font-bold text-white mb-2">
-              Experimente o Futuro
+              Trinity AI Lab
             </h3>
             <p className="text-gray-400 text-sm max-w-md mx-auto">
-              Utilize nossa ferramenta exclusiva powered by Gemini Veo para criar conceitos de vídeo em tempo real.
+              Explore o poder da criação generativa. Visualize conceitos, sintetize voz e crie atmosferas sonoras em tempo real.
             </p>
           </div>
 

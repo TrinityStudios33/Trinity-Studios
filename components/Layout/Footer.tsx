@@ -4,7 +4,7 @@ import { Instagram, Linkedin, Youtube, Twitter, MapPin, Phone, Mail } from 'luci
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-zinc-950 border-t border-white/10 pt-16 pb-8">
+    <footer className="relative z-50 bg-zinc-950 border-t border-white/10 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           

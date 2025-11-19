@@ -11,38 +11,48 @@ const MatrixBackground: React.FC = () => {
     if (!ctx) return;
 
     let animationFrameId: number;
-
-    const setCanvasSize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    setCanvasSize();
-    window.addEventListener('resize', setCanvasSize);
-
-    // Config
-    const fontSize = 14;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops: number[] = new Array(columns).fill(1);
+    let columns: number = 0;
+    let drops: number[] = [];
     
-    // Characters (Binary + Katakana + Standard for tech feel)
+    const fontSize = 14;
     const chars = "01010123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    const initMatrix = () => {
+      // Set canvas size to window size
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      // Calculate columns
+      const newColumns = Math.floor(canvas.width / fontSize);
+      
+      // If columns increased, extend the drops array
+      // If decreased, slice it (or just reset to be safe and simple)
+      if (newColumns !== columns) {
+        columns = newColumns;
+        drops = new Array(columns).fill(1).map(() => Math.random() * -100); // Start at random heights off-screen
+      }
+    };
+
+    // Initialize
+    initMatrix();
+    
+    // Handle resize
+    window.addEventListener('resize', initMatrix);
+
     const draw = () => {
-      // Semi-transparent black to create trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      // Dark fade to clear trails faster (0.1 = trails last a bit, 0.2 = trails vanish fast)
+      // Using 0.1 for a dark, clean look
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Text color - Golden/Tech hue
-      ctx.fillStyle = '#D4AF37'; // Gold color
       ctx.font = `${fontSize}px monospace`;
 
       for (let i = 0; i < drops.length; i++) {
         const text = chars[Math.floor(Math.random() * chars.length)];
         
-        // Random lightness for glittering effect
-        const opacity = Math.random() > 0.95 ? 1 : 0.3;
-        ctx.fillStyle = `rgba(212, 175, 55, ${opacity})`;
+        // Very subtle text opacity
+        const isBright = Math.random() > 0.99;
+        ctx.fillStyle = isBright ? '#D4AF37' : 'rgba(212, 175, 55, 0.15)';
 
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
@@ -60,7 +70,7 @@ const MatrixBackground: React.FC = () => {
     draw();
 
     return () => {
-      window.removeEventListener('resize', setCanvasSize);
+      window.removeEventListener('resize', initMatrix);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -68,7 +78,7 @@ const MatrixBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-20"
+      className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none"
     />
   );
 };

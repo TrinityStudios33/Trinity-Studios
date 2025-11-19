@@ -23,21 +23,22 @@ export const Process: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-4">
           {steps.map((item, index) => (
-            <div key={index} className="relative flex flex-col items-center text-center group">
-              {/* Icon Circle */}
-              <div className="w-16 h-16 rounded-full bg-black border border-gold-500/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10 group-hover:border-gold-500 group-hover:scale-110 transition-all duration-300">
-                <item.icon className="text-gold-500 w-8 h-8" />
+            <div key={index} className="relative flex flex-col items-center text-center group cursor-default">
+              {/* Icon Circle with LED Effect */}
+              <div className="w-16 h-16 rounded-full bg-black border border-gold-500/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10 transition-all duration-500 
+                              group-hover:border-gold-400 group-hover:bg-gold-500 group-hover:shadow-[0_0_60px_rgba(212,175,55,0.6)] group-hover:scale-110">
+                <item.icon className="text-gold-500 w-8 h-8 transition-colors duration-300 group-hover:text-black" />
               </div>
               
               {/* Number Background */}
-              <span className="absolute top-0 text-6xl font-display font-bold text-white/5 -z-10 select-none transform -translate-y-4">
+              <span className="absolute top-0 text-6xl font-display font-bold text-white/5 -z-10 select-none transform -translate-y-4 transition-colors duration-300 group-hover:text-gold-500/10">
                 0{index + 1}
               </span>
 
-              <h4 className="text-white font-bold font-display uppercase tracking-wider mb-2">
+              <h4 className="text-white font-bold font-display uppercase tracking-wider mb-2 group-hover:text-gold-400 transition-colors">
                 {item.title}
               </h4>
-              <p className="text-gray-400 text-sm max-w-[200px]">
+              <p className="text-gray-400 text-sm max-w-[200px] group-hover:text-gray-300 transition-colors">
                 {item.desc}
               </p>
             </div>

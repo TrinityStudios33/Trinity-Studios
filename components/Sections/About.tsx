@@ -2,10 +2,6 @@ import React from 'react';
 import { GeometricMandala } from '../Background/GeometricMandala';
 
 // --- ÁREA DE CONFIGURAÇÃO DA FOTO ---
-// Cole o link direto da sua foto aqui dentro das aspas.
-// Exemplo Google Drive (convertido): "https://drive.google.com/uc?export=view&id=SEU_ID"
-// Exemplo Postimages/Imgur: "https://i.postimg.cc/xyz/kevin.png"
-// Se deixar vazio ou o link falhar, usará a imagem padrão.
 const LINK_DA_FOTO = "https://i.postimg.cc/Sxc1MwZV/kevin.png"; 
 // ------------------------------------
 
@@ -17,7 +13,7 @@ export const About: React.FC = () => {
       {/* Animated Geometric Background */}
       <GeometricMandala />
 
-      {/* Additional Decorative Background Elements (Subtle) */}
+      {/* Additional Decorative Background Elements */}
       <div className="absolute top-20 right-0 w-96 h-96 bg-gold-500/5 rounded-full blur-[100px] pointer-events-none mix-blend-screen"></div>
       <div className="absolute bottom-20 left-0 w-64 h-64 bg-blue-900/10 rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -38,18 +34,14 @@ export const About: React.FC = () => {
                     <img 
                       src={LINK_DA_FOTO}
                       onError={(e) => {
-                        // Fallback image if the link is broken or empty
                         e.currentTarget.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop";
                         e.currentTarget.onerror = null;
                       }}
                       alt="Kevin Marques - Founder" 
                       className="w-full h-auto object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-110 mask-image-gradient"
                     />
-                    
-                    {/* Gradient Overlay for Blending (Simulates background removal at bottom) */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-100 h-full top-1/3"></div>
 
-                    {/* Name Tag */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 text-center z-20">
                         <div className="inline-block px-4 py-1 mb-2 border border-gold-500/30 rounded-full bg-black/50 backdrop-blur-sm">
                             <span className="text-gold-500 text-[10px] md:text-xs font-display tracking-[0.3em] uppercase">
@@ -82,7 +74,6 @@ export const About: React.FC = () => {
               Com o tempo, o nome evoluiu e a marca se tornou Trinity Studios, representando uma nova fase, mais madura e tecnológica, sem perder a essência artística que deu início a tudo. Hoje, a empresa conta com uma equipe completa, preparada e equipada com as melhores ferramentas do mercado.
             </p>
             
-            {/* Signature / Tech Element */}
             <div className="flex items-center gap-4 opacity-80">
                 <div className="h-px w-12 bg-gold-500"></div>
                 <span className="font-cyber text-xs text-gold-500 tracking-widest">TRINITY ORIGINAL</span>
