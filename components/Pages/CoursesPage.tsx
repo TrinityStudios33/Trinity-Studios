@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { DecryptedText } from '../UI/DecryptedText';
-import { Users, BookOpen, PlayCircle, Cpu, Video, Rocket, ArrowRight, MessageCircle, Music, Mic, Clapperboard } from 'lucide-react';
+import { Users, BookOpen, PlayCircle, Cpu, Video, Rocket, ArrowRight, MessageCircle, Music, Mic, Clapperboard, Ghost, Mic2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const COURSES = [
@@ -43,7 +43,7 @@ const COURSES = [
   {
     id: 5,
     title: "Produção Musical Pro",
-    desc: "Do beat à masterização. Domine DAWs, mixagem e teoria musical para produzir faixas profissionais.",
+    desc: "Do beat à masterização. Domine DAWs, mixagem e teoria musical. Com Kevin Marques e convidados.",
     level: "Intermediário",
     duration: "45h",
     icon: Music,
@@ -66,6 +66,24 @@ const COURSES = [
     duration: "30h",
     icon: Clapperboard,
     image: "https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=1000&auto=format&fit=crop"
+  },
+  {
+    id: 8,
+    title: "Narração & Oratória",
+    desc: "Técnicas vocais com Kevin Marques. Aprenda a narrar, contar histórias e se comunicar com confiança.",
+    level: "Todos",
+    duration: "25h",
+    icon: Mic2,
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?q=80&w=1000&auto=format&fit=crop"
+  },
+  {
+    id: 9,
+    title: "Vivendo de Canais Dark",
+    desc: "Crie e monetize canais sem aparecer. Automação, roteiro e edição para YouTube e TikTok.",
+    level: "Iniciante",
+    duration: "35h",
+    icon: Ghost,
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop"
   }
 ];
 

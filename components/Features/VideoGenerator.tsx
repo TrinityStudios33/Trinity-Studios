@@ -17,12 +17,12 @@ import {
   FileText,
   ArrowRight,
   Copy,
-  Video,
-  LogIn,
-  AlertCircle
+  KeyRound,
+  LogOut,
+  ExternalLink
 } from 'lucide-react';
 
-type TabType = 'script' | 'vision' | 'video' | 'voice' | 'music';
+type TabType = 'script' | 'vision' | 'voice' | 'music';
 
 // Styles for Image Generation
 const VISUAL_STYLES = [
@@ -33,7 +33,7 @@ const VISUAL_STYLES = [
   { id: 'studio', label: 'Fotografia de Estúdio', prompt: 'studio photography, professional lighting, plain background, high detail, sharp focus, 85mm lens' },
 ];
 
-// Voice Options (Gemini TTS) - Mapped to Age/Gender archetypes
+// Voice Options (Gemini TTS)
 const VOICE_OPTIONS = [
   { id: 'Puck', label: 'Jovem / Criança (Masculina)', desc: 'Tom lúdico e jovial' },
   { id: 'Zephyr', label: 'Jovem (Feminina)', desc: 'Enérgica e dinâmica' },
@@ -78,7 +78,7 @@ const SCRIPT_PERSONAS = [
   },
 ];
 
-// Music Samples mapped to keywords
+// Music Samples
 const MUSIC_LIBRARY = [
   { keywords: ['rock', 'metal', 'agressivo', 'ação', 'rápido', 'guitarra'], url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=cyberpunk-city-11028.mp3', mood: 'Cyberpunk Action' },
   { keywords: ['calmo', 'piano', 'triste', 'emocional', 'lento', 'drama'], url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=cinematic-atmosphere-score-2-21268.mp3', mood: 'Cinematic Piano' },
@@ -89,6 +89,43 @@ const MUSIC_LIBRARY = [
 ];
 
 export const VideoGenerator: React.FC = () => {
+  // --- API KEY GATEKEEPER ---
+  const [apiKey, setApiKey] = useState<string>('');
+  const [isKeyValid, setIsKeyValid] = useState(false);
+  const [tempKey, setTempKey] = useState('');
+
+  // Check for existing key (Environment or LocalStorage)
+  useEffect(() => {
+    const envKey = process.env.API_KEY;
+    const storedKey = localStorage.getItem('trinity_api_key');
+    
+    if (envKey && envKey.length > 10) {
+      setApiKey(envKey);
+      setIsKeyValid(true);
+    } else if (storedKey && storedKey.length > 10) {
+      setApiKey(storedKey);
+      setIsKeyValid(true);
+    }
+  }, []);
+
+  const handleSaveKey = () => {
+    if (tempKey.length > 10) {
+      localStorage.setItem('trinity_api_key', tempKey);
+      setApiKey(tempKey);
+      setIsKeyValid(true);
+    } else {
+      alert("Chave API parece inválida. Verifique e tente novamente.");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('trinity_api_key');
+    setApiKey('');
+    setIsKeyValid(false);
+    setTempKey('');
+  };
+
+  // --- TABS & STATE ---
   const [activeTab, setActiveTab] = useState<TabType>('script');
   
   // --- VISION STATE ---
@@ -97,19 +134,11 @@ export const VideoGenerator: React.FC = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
-  // --- VIDEO STATE (VEO) ---
-  const [videoPrompt, setVideoPrompt] = useState('');
-  const [isVeoGenerating, setIsVeoGenerating] = useState(false);
-  const [veoVideoUrl, setVeoVideoUrl] = useState<string | null>(null);
-  const [hasVeoKey, setHasVeoKey] = useState(false);
-  const [veoQuota, setVeoQuota] = useState(0);
-  const VEO_LIMIT = 3;
-
   // --- VOICE STATE ---
   const [voiceText, setVoiceText] = useState('');
   const [voiceTone, setVoiceTone] = useState('');
-  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[3]); // Default Kore
-  const [isSpeaking, setIsSpeaking] = useState(false); // "Speaking" means generating now
+  const [selectedVoice, setSelectedVoice] = useState(VOICE_OPTIONS[3]);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [audioDownloadUrl, setAudioDownloadUrl] = useState<string | null>(null);
   
   // Voice Player State
@@ -132,28 +161,6 @@ export const VideoGenerator: React.FC = () => {
   const [generatedScript, setGeneratedScript] = useState('');
   const [isGeneratingScript, setIsGeneratingScript] = useState(false);
 
-  // --- EFFECTS ---
-  useEffect(() => {
-    checkApiKey();
-  }, []);
-
-  const checkApiKey = async () => {
-    if ((window as any).aistudio && (window as any).aistudio.hasSelectedApiKey) {
-      const hasKey = await (window as any).aistudio.hasSelectedApiKey();
-      setHasVeoKey(hasKey);
-    }
-  };
-
-  const handleVeoLogin = async () => {
-    if ((window as any).aistudio && (window as any).aistudio.openSelectKey) {
-      await (window as any).aistudio.openSelectKey();
-      // After selection, check again (handling potential race condition by assuming true if opened and closed, or polling)
-      setHasVeoKey(true); 
-    } else {
-      alert("Ambiente não suporta login direto. Por favor, contate o administrador.");
-    }
-  };
-
   // --- HELPER: Time Formatting ---
   const formatTime = (time: number) => {
     if (isNaN(time)) return "00:00";
@@ -169,7 +176,7 @@ export const VideoGenerator: React.FC = () => {
     setGeneratedScript('');
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: {
@@ -185,7 +192,7 @@ export const VideoGenerator: React.FC = () => {
       }
     } catch (error) {
       console.error("Script Error", error);
-      alert("Erro ao gerar roteiro.");
+      alert("Erro ao gerar roteiro. Verifique sua chave API.");
     } finally {
       setIsGeneratingScript(false);
     }
@@ -217,7 +224,7 @@ export const VideoGenerator: React.FC = () => {
     setGeneratedImage(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       const finalPrompt = `Generate a high quality image of: ${imagePrompt}. 
       Art Style: ${selectedStyle.prompt}. 
       Requirements: No text overlay, high fidelity, detailed, photorealistic or stylized as requested.`;
@@ -245,65 +252,9 @@ export const VideoGenerator: React.FC = () => {
       }
     } catch (error) {
       console.error("Image Gen Error", error);
-      alert("Erro ao gerar imagem. Tente novamente.");
+      alert("Erro ao gerar imagem. Verifique sua chave API.");
     } finally {
       setIsGeneratingImage(false);
-    }
-  };
-
-  // --- VEO VIDEO LOGIC ---
-  const generateVeoVideo = async () => {
-    if (!videoPrompt) return;
-    if (veoQuota >= VEO_LIMIT) {
-        alert("Limite de 3 vídeos por sessão atingido.");
-        return;
-    }
-
-    setIsVeoGenerating(true);
-    setVeoVideoUrl(null);
-
-    try {
-      // Re-instantiate to ensure we use the user's selected key from the login process
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      
-      let operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
-        prompt: videoPrompt,
-        config: {
-          numberOfVideos: 1,
-          resolution: '1080p',
-          aspectRatio: '16:9'
-        }
-      });
-
-      // Polling loop
-      while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5s
-        operation = await ai.operations.getVideosOperation({ operation: operation });
-      }
-
-      const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
-      
-      if (videoUri) {
-        // Append key to fetch the bytes
-        const authenticatedUrl = `${videoUri}&key=${process.env.API_KEY}`;
-        setVeoVideoUrl(authenticatedUrl);
-        setVeoQuota(prev => prev + 1);
-      } else {
-          throw new Error("Video generation completed but no URI returned.");
-      }
-
-    } catch (error) {
-      console.error("Veo Error:", error);
-      // Reset key state if it fails due to auth to prompt login again
-      if (JSON.stringify(error).includes("403") || JSON.stringify(error).includes("key")) {
-          setHasVeoKey(false);
-          alert("Sessão expirada ou chave inválida. Por favor, faça login novamente.");
-      } else {
-          alert("Erro na geração do vídeo. Tente um prompt diferente.");
-      }
-    } finally {
-      setIsVeoGenerating(false);
     }
   };
 
@@ -346,7 +297,7 @@ export const VideoGenerator: React.FC = () => {
     setIsVoicePlaying(false);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
@@ -375,7 +326,7 @@ export const VideoGenerator: React.FC = () => {
 
     } catch (error) {
       console.error("TTS Error:", error);
-      alert("Erro ao gerar voz. Verifique sua conexão.");
+      alert("Erro ao gerar voz. Verifique sua chave API.");
     } finally {
       setIsSpeaking(false);
     }
@@ -448,6 +399,44 @@ export const VideoGenerator: React.FC = () => {
     setIsPlayingMusic(!isPlayingMusic);
   };
 
+  // --- RENDER LOGIN SCREEN IF NO KEY ---
+  if (!isKeyValid) {
+     return (
+        <div className="relative w-full max-w-3xl mx-auto p-1 rounded-xl bg-gradient-to-b from-gold-500/20 to-transparent backdrop-blur-md border border-gold-500/30 shadow-[0_0_30px_rgba(212,175,55,0.1)]">
+           <div className="bg-black/90 rounded-lg p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
+              <div className="w-20 h-20 rounded-full bg-gold-500/10 flex items-center justify-center mb-6 border border-gold-500/30 animate-pulse">
+                 <KeyRound className="text-gold-500" size={40} />
+              </div>
+              <h3 className="text-2xl font-cyber font-bold text-white uppercase tracking-wider mb-4">Acesso Restrito</h3>
+              <p className="text-gray-400 max-w-md mb-8 leading-relaxed">
+                 Para utilizar o Laboratório de IA da Trinity em ambiente externo, é necessário conectar sua própria Chave de API (Gemini).
+              </p>
+              
+              <div className="w-full max-w-sm space-y-4">
+                 <input 
+                    type="password" 
+                    placeholder="Cole sua API Key aqui..."
+                    value={tempKey}
+                    onChange={(e) => setTempKey(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/20 rounded-sm px-4 py-3 text-white text-center focus:border-gold-500 outline-none"
+                 />
+                 <button 
+                    onClick={handleSaveKey}
+                    className="w-full py-3 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all"
+                 >
+                    Conectar Laboratório
+                 </button>
+              </div>
+              
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="mt-6 flex items-center gap-2 text-xs text-gray-500 hover:text-gold-500 transition-colors">
+                 <ExternalLink size={12} /> Obter Chave Gratuita no Google AI Studio
+              </a>
+           </div>
+        </div>
+     );
+  }
+
+  // --- MAIN RENDER ---
   return (
     <div className="relative w-full max-w-5xl mx-auto p-1 rounded-xl bg-gradient-to-b from-gold-500/20 to-transparent backdrop-blur-md border border-gold-500/30 shadow-[0_0_30px_rgba(212,175,55,0.1)]">
       <div className="bg-black/90 rounded-lg p-6 md:p-8 relative overflow-hidden min-h-[600px] flex flex-col">
@@ -463,28 +452,34 @@ export const VideoGenerator: React.FC = () => {
             </p>
           </div>
 
-          {/* Tabs - Grid Layout for better fit */}
-          <div className="w-full xl:w-auto grid grid-cols-3 sm:grid-cols-5 gap-2 bg-zinc-900/80 p-1 rounded-lg border border-white/10">
-            {[
-              { id: 'script', icon: FileText, label: 'Roteiros' },
-              { id: 'vision', icon: ImageIcon, label: 'Imagens' },
-              { id: 'video', icon: Video, label: 'Vídeo (Veo)' },
-              { id: 'voice', icon: Mic, label: 'Voz' },
-              { id: 'music', icon: Music, label: 'Música' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as TabType)}
-                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-[10px] sm:text-xs font-display uppercase tracking-widest transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-gold-500 text-black shadow-lg font-bold'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <tab.icon size={14} className="hidden sm:block" />
-                <span className="truncate">{tab.label}</span>
+          <div className="flex gap-4 items-center">
+              {/* Tabs - Grid Layout */}
+              <div className="grid grid-cols-4 gap-2 bg-zinc-900/80 p-1 rounded-lg border border-white/10">
+                {[
+                  { id: 'script', icon: FileText, label: 'Roteiros' },
+                  { id: 'vision', icon: ImageIcon, label: 'Imagens' },
+                  { id: 'voice', icon: Mic, label: 'Voz' },
+                  { id: 'music', icon: Music, label: 'Música' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as TabType)}
+                    className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-[10px] sm:text-xs font-display uppercase tracking-widest transition-all ${
+                      activeTab === tab.id
+                        ? 'bg-gold-500 text-black shadow-lg font-bold'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <tab.icon size={14} className="hidden sm:block" />
+                    <span className="truncate">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+              
+              {/* Logout Button */}
+              <button onClick={handleLogout} className="p-2 text-gray-500 hover:text-red-400 transition-colors" title="Sair / Trocar Chave">
+                  <LogOut size={18} />
               </button>
-            ))}
           </div>
         </div>
 
@@ -573,61 +568,6 @@ export const VideoGenerator: React.FC = () => {
                 <button onClick={generateImage} disabled={isGeneratingImage || !imagePrompt} className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50">
                   {isGeneratingImage ? 'Gerando Imagem...' : 'Gerar Conceito'}
                 </button>
-              </div>
-            )}
-
-            {/* VEO VIDEO CONTROLS */}
-            {activeTab === 'video' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-300">
-                 
-                 {!hasVeoKey ? (
-                    <div className="bg-zinc-900/80 border border-gold-500/20 p-6 rounded-sm text-center space-y-4">
-                        <div className="w-12 h-12 bg-gold-500/10 rounded-full flex items-center justify-center mx-auto">
-                            <User className="text-gold-500" size={24} />
-                        </div>
-                        <h4 className="text-white font-display uppercase tracking-widest font-bold">Login Necessário</h4>
-                        <p className="text-xs text-gray-400 leading-relaxed">
-                            Para gerar vídeos com o <strong>Google Veo</strong>, você precisa fazer login com sua conta Google. Isso utilizará sua própria cota de testes do Gemini API.
-                        </p>
-                        <button 
-                            onClick={handleVeoLogin}
-                            className="w-full py-3 flex items-center justify-center gap-2 bg-white text-black font-bold font-display uppercase tracking-widest hover:bg-gray-200 transition-all rounded-sm"
-                        >
-                            <LogIn size={16} /> Login com Google
-                        </button>
-                        <p className="text-[9px] text-gray-500">
-                            Seus dados são processados diretamente pelo Google.
-                        </p>
-                    </div>
-                 ) : (
-                    <>
-                        <div className="space-y-2">
-                            <label className="text-xs font-display uppercase tracking-widest text-gold-500 flex justify-between">
-                                Prompt do Vídeo (Inglês recomendado)
-                                <span className="text-[10px] text-gray-400">Cota: {veoQuota}/{VEO_LIMIT}</span>
-                            </label>
-                            <textarea
-                                value={videoPrompt}
-                                onChange={(e) => setVideoPrompt(e.target.value)}
-                                placeholder="Ex: A cinematic drone shot of a futuristic cyberpunk city with neon lights and flying cars, rain, 8k..."
-                                className="w-full h-32 bg-zinc-900/50 border border-white/10 rounded-sm p-4 text-white focus:border-gold-500 outline-none resize-none text-sm font-light"
-                            />
-                        </div>
-                        <button
-                            onClick={generateVeoVideo}
-                            disabled={isVeoGenerating || !videoPrompt || veoQuota >= VEO_LIMIT}
-                            className="w-full py-4 bg-gold-500 text-black font-bold font-display uppercase tracking-widest hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(212,175,55,0.2)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
-                        >
-                            {isVeoGenerating ? 'Renderizando Veo...' : 'Gerar Vídeo (Veo 3)'}
-                        </button>
-                        <div className="flex items-start gap-2 p-3 bg-blue-900/20 border border-blue-500/20 rounded-sm">
-                            <AlertCircle size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-                            <p className="text-[10px] text-blue-300 leading-relaxed">
-                                <strong>Modo Experimental:</strong> A geração pode levar até 1-2 minutos. O vídeo será exibido ao lado assim que concluído.
-                            </p>
-                        </div>
-                    </>
-                 )}
               </div>
             )}
 
@@ -752,39 +692,6 @@ export const VideoGenerator: React.FC = () => {
                      <div className="text-center opacity-30">
                         <ImageIcon size={64} className="mx-auto mb-4 text-white" />
                         <p className="font-display uppercase tracking-widest text-sm">Aguardando Prompt</p>
-                     </div>
-                  )}
-               </div>
-            )}
-
-            {/* VEO VIDEO DISPLAY */}
-            {activeTab === 'video' && (
-               <div className="relative w-full h-full flex items-center justify-center bg-zinc-900">
-                  {isVeoGenerating ? (
-                     <div className="text-center z-20 p-8">
-                        <Loader2 size={48} className="text-gold-500 animate-spin mb-6 mx-auto" />
-                        <p className="text-gold-500 text-sm font-cyber tracking-widest animate-pulse mb-2">GERANDO VÍDEO COM VEO</p>
-                        <p className="text-gray-500 text-xs max-w-xs mx-auto leading-relaxed">
-                           Isso pode levar de 1 a 2 minutos. A IA está calculando física, luz e movimento...
-                        </p>
-                     </div>
-                  ) : veoVideoUrl ? (
-                     <div className="relative w-full h-full flex items-center justify-center bg-black">
-                         <video 
-                            src={veoVideoUrl} 
-                            controls 
-                            autoPlay 
-                            loop 
-                            className="max-w-full max-h-full"
-                         />
-                     </div>
-                  ) : (
-                     <div className="text-center opacity-30 flex flex-col items-center">
-                        <div className="w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center mb-4">
-                             <Video size={40} className="text-white" />
-                        </div>
-                        <p className="font-display uppercase tracking-widest text-sm">Aguardando Geração VEO</p>
-                        {!hasVeoKey && <p className="text-xs text-red-400 mt-2">Faça login para começar</p>}
                      </div>
                   )}
                </div>

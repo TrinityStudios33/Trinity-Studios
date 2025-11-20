@@ -3,16 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DecryptedText } from '../UI/DecryptedText';
 import { 
   ArrowLeft, 
-  CheckCircle, 
   Clock, 
-  BarChart, 
-  Cpu, 
-  Video, 
-  Music, 
-  Mic, 
   Layers, 
   Globe, 
-  PlayCircle 
 } from 'lucide-react';
 
 // --- COURSE DATABASE ---
@@ -92,8 +85,8 @@ const COURSE_DATA: Record<string, any> = {
   },
   '5': {
     title: "Produção Musical Pro",
-    subtitle: "Do Beat à Masterização",
-    description: "Domine a arte de produzir música. Aprenda teoria musical aplicada, beatmaking, gravação, mixagem e masterização para lançar faixas com qualidade de estúdio.",
+    subtitle: "Com Kevin Marques & Convidados",
+    description: "Domine a arte de produzir música. Aprenda teoria musical aplicada, beatmaking, gravação, mixagem e masterização para lançar faixas com qualidade de estúdio. Inclui módulos especiais com Kevin Marques sobre composição criativa.",
     duration: "45 Horas",
     level: "Intermediário",
     tools: ["Ableton Live", "FL Studio", "Logic Pro", "Plugins VST"],
@@ -103,7 +96,8 @@ const COURSE_DATA: Record<string, any> = {
       "Síntese Sonora e Sound Design",
       "Gravação de Voz e Instrumentos",
       "Mixagem Avançada",
-      "Masterização para Streaming"
+      "Masterização para Streaming",
+      "Marketing para Músicos"
     ],
     target: "Músicos, DJs e Produtores.",
     image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1000&auto=format&fit=crop"
@@ -142,6 +136,42 @@ const COURSE_DATA: Record<string, any> = {
     ],
     target: "Videomakers e Diretores.",
     image: "https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=1000&auto=format&fit=crop"
+  },
+  '8': {
+    title: "Narração & Oratória",
+    subtitle: "A Voz que Conecta",
+    description: "Com mais de 10 anos de experiência, Kevin Marques ensina as técnicas definitivas para dominar sua voz. Aprenda a narrar histórias, gravar audiolivros, locução publicitária e técnicas de oratória para apresentações impactantes.",
+    duration: "25 Horas",
+    level: "Todos os Níveis",
+    tools: ["Microfone Profissional", "Audacity/Adobe Audition", "Técnicas de Respiração"],
+    modules: [
+      "Fisiologia da Voz e Aquecimento",
+      "Interpretação e Intenção",
+      "Mercado de Audiolivros e Locução",
+      "Técnicas de Oratória para Vídeos",
+      "Edição e Tratamento de Voz",
+      "Montando seu Home Studio"
+    ],
+    target: "Locutores, YouTubers, Professores e Palestrantes.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?q=80&w=1000&auto=format&fit=crop"
+  },
+  '9': {
+    title: "Vivendo de Canais Dark",
+    subtitle: "Liberdade Financeira Anônima",
+    description: "Aprenda a criar, crescer e monetizar canais no YouTube e TikTok sem precisar aparecer. Domine a automação de conteúdo, edição dinâmica e as estratégias secretas de retenção que geram milhões de visualizações.",
+    duration: "35 Horas",
+    level: "Iniciante ao Avançado",
+    tools: ["YouTube Analytics", "IA de Roteiro", "Editores de Vídeo", "Stock Footage"],
+    modules: [
+      "Nichos Lucrativos e CPM",
+      "Roteirização Automatizada com IA",
+      "Edição Dinâmica para Retenção (Style)",
+      "Thumbnails que Recebem Cliques",
+      "SEO para YouTube",
+      "Monetização e Vendas como Afiliado"
+    ],
+    target: "Empreendedores Digitais e Quem busca Renda Extra.",
+    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop"
   }
 };
 
